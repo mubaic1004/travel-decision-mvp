@@ -1,0 +1,1089 @@
+{
+  "version": "1.0.0",
+  "currency": "CNY",
+  "base_origin": {
+    "city_code": "SHA",
+    "city_name": "Shanghai",
+    "airports": ["SHA", "PVG"]
+  },
+  "display_copy": {
+    "price_label": "参考价格",
+    "flight_price_label": "参考机票价",
+    "hotel_price_label": "参考酒店价",
+    "total_price_label": "参考总价",
+    "disclaimer": "价格为基于历史区间和规则模型的参考估算，用于比较不同请假方案，不代表实时成交价。"
+  },
+  "supported_destinations": [
+    {
+      "city_code": "BJS",
+      "city_name": "Beijing",
+      "country_code": "CN",
+      "country_name": "China",
+      "region_type": "domestic",
+      "route_key": "SHA-BJS",
+      "hotel_key": "BJS"
+    },
+    {
+      "city_code": "CTU",
+      "city_name": "Chengdu",
+      "country_code": "CN",
+      "country_name": "China",
+      "region_type": "domestic",
+      "route_key": "SHA-CTU",
+      "hotel_key": "CTU"
+    },
+    {
+      "city_code": "XIY",
+      "city_name": "Xi'an",
+      "country_code": "CN",
+      "country_name": "China",
+      "region_type": "domestic",
+      "route_key": "SHA-XIY",
+      "hotel_key": "XIY"
+    },
+    {
+      "city_code": "CKG",
+      "city_name": "Chongqing",
+      "country_code": "CN",
+      "country_name": "China",
+      "region_type": "domestic",
+      "route_key": "SHA-CKG",
+      "hotel_key": "CKG"
+    },
+    {
+      "city_code": "CAN",
+      "city_name": "Guangzhou",
+      "country_code": "CN",
+      "country_name": "China",
+      "region_type": "domestic",
+      "route_key": "SHA-CAN",
+      "hotel_key": "CAN"
+    },
+    {
+      "city_code": "SZX",
+      "city_name": "Shenzhen",
+      "country_code": "CN",
+      "country_name": "China",
+      "region_type": "domestic",
+      "route_key": "SHA-SZX",
+      "hotel_key": "SZX"
+    },
+    {
+      "city_code": "KMG",
+      "city_name": "Kunming",
+      "country_code": "CN",
+      "country_name": "China",
+      "region_type": "domestic",
+      "route_key": "SHA-KMG",
+      "hotel_key": "KMG"
+    },
+    {
+      "city_code": "SYX",
+      "city_name": "Sanya",
+      "country_code": "CN",
+      "country_name": "China",
+      "region_type": "domestic",
+      "route_key": "SHA-SYX",
+      "hotel_key": "SYX"
+    },
+    {
+      "city_code": "DYG",
+      "city_name": "Zhangjiajie",
+      "country_code": "CN",
+      "country_name": "China",
+      "region_type": "domestic",
+      "route_key": "SHA-DYG",
+      "hotel_key": "DYG"
+    },
+    {
+      "city_code": "XMN",
+      "city_name": "Xiamen",
+      "country_code": "CN",
+      "country_name": "China",
+      "region_type": "domestic",
+      "route_key": "SHA-XMN",
+      "hotel_key": "XMN"
+    },
+    {
+      "city_code": "HRB",
+      "city_name": "Harbin",
+      "country_code": "CN",
+      "country_name": "China",
+      "region_type": "domestic",
+      "route_key": "SHA-HRB",
+      "hotel_key": "HRB"
+    },
+    {
+      "city_code": "HKG",
+      "city_name": "Hong Kong",
+      "country_code": "HK",
+      "country_name": "Hong Kong",
+      "region_type": "international",
+      "route_key": "SHA-HKG",
+      "hotel_key": "HKG"
+    },
+    {
+      "city_code": "TYO",
+      "city_name": "Tokyo",
+      "country_code": "JP",
+      "country_name": "Japan",
+      "region_type": "international",
+      "route_key": "SHA-TYO",
+      "hotel_key": "TYO"
+    },
+    {
+      "city_code": "BKK",
+      "city_name": "Bangkok",
+      "country_code": "TH",
+      "country_name": "Thailand",
+      "region_type": "international",
+      "route_key": "SHA-BKK",
+      "hotel_key": "BKK"
+    },
+    {
+      "city_code": "SIN",
+      "city_name": "Singapore",
+      "country_code": "SG",
+      "country_name": "Singapore",
+      "region_type": "international",
+      "route_key": "SHA-SIN",
+      "hotel_key": "SIN"
+    },
+    {
+      "city_code": "ICN",
+      "city_name": "Seoul",
+      "country_code": "KR",
+      "country_name": "South Korea",
+      "region_type": "international",
+      "route_key": "SHA-ICN",
+      "hotel_key": "ICN"
+    },
+    { "city_code": "HGH", "city_name": "Hangzhou", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-HGH", "hotel_key": "HGH" },
+    { "city_code": "NKG", "city_name": "Nanjing", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-NKG", "hotel_key": "NKG" },
+    { "city_code": "WUH", "city_name": "Wuhan", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-WUH", "hotel_key": "WUH" },
+    { "city_code": "CSX", "city_name": "Changsha", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-CSX", "hotel_key": "CSX" },
+    { "city_code": "TAO", "city_name": "Qingdao", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-TAO", "hotel_key": "TAO" },
+    { "city_code": "TSN", "city_name": "Tianjin", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-TSN", "hotel_key": "TSN" },
+    { "city_code": "DLC", "city_name": "Dalian", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-DLC", "hotel_key": "DLC" },
+    { "city_code": "SHE", "city_name": "Shenyang", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-SHE", "hotel_key": "SHE" },
+    { "city_code": "HAK", "city_name": "Haikou", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-HAK", "hotel_key": "HAK" },
+    { "city_code": "KWL", "city_name": "Guilin", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-KWL", "hotel_key": "KWL" },
+    { "city_code": "LJG", "city_name": "Lijiang", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-LJG", "hotel_key": "LJG" },
+    { "city_code": "LXA", "city_name": "Lhasa", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-LXA", "hotel_key": "LXA" },
+    { "city_code": "URC", "city_name": "Urumqi", "country_code": "CN", "country_name": "China", "region_type": "domestic", "route_key": "SHA-URC", "hotel_key": "URC" },
+    { "city_code": "MFM", "city_name": "Macau", "country_code": "MO", "country_name": "Macau SAR", "region_type": "international", "route_key": "SHA-MFM", "hotel_key": "MFM" },
+    { "city_code": "TPE", "city_name": "Taipei", "country_code": "TW", "country_name": "Taiwan", "region_type": "international", "route_key": "SHA-TPE", "hotel_key": "TPE" },
+    { "city_code": "OSA", "city_name": "Osaka", "country_code": "JP", "country_name": "Japan", "region_type": "international", "route_key": "SHA-OSA", "hotel_key": "OSA" },
+    { "city_code": "FUK", "city_name": "Fukuoka", "country_code": "JP", "country_name": "Japan", "region_type": "international", "route_key": "SHA-FUK", "hotel_key": "FUK" },
+    { "city_code": "SPK", "city_name": "Sapporo", "country_code": "JP", "country_name": "Japan", "region_type": "international", "route_key": "SHA-SPK", "hotel_key": "SPK" },
+    { "city_code": "OKA", "city_name": "Okinawa", "country_code": "JP", "country_name": "Japan", "region_type": "international", "route_key": "SHA-OKA", "hotel_key": "OKA" },
+    { "city_code": "PUS", "city_name": "Busan", "country_code": "KR", "country_name": "South Korea", "region_type": "international", "route_key": "SHA-PUS", "hotel_key": "PUS" },
+    { "city_code": "HAN", "city_name": "Hanoi", "country_code": "VN", "country_name": "Vietnam", "region_type": "international", "route_key": "SHA-HAN", "hotel_key": "HAN" },
+    { "city_code": "SGN", "city_name": "Ho Chi Minh City", "country_code": "VN", "country_name": "Vietnam", "region_type": "international", "route_key": "SHA-SGN", "hotel_key": "SGN" },
+    { "city_code": "CNX", "city_name": "Chiang Mai", "country_code": "TH", "country_name": "Thailand", "region_type": "international", "route_key": "SHA-CNX", "hotel_key": "CNX" },
+    { "city_code": "HKT", "city_name": "Phuket", "country_code": "TH", "country_name": "Thailand", "region_type": "international", "route_key": "SHA-HKT", "hotel_key": "HKT" },
+    { "city_code": "KUL", "city_name": "Kuala Lumpur", "country_code": "MY", "country_name": "Malaysia", "region_type": "international", "route_key": "SHA-KUL", "hotel_key": "KUL" },
+    { "city_code": "DPS", "city_name": "Bali", "country_code": "ID", "country_name": "Indonesia", "region_type": "international", "route_key": "SHA-DPS", "hotel_key": "DPS" },
+    { "city_code": "MNL", "city_name": "Manila", "country_code": "PH", "country_name": "Philippines", "region_type": "international", "route_key": "SHA-MNL", "hotel_key": "MNL" },
+    { "city_code": "MLE", "city_name": "Maldives", "country_code": "MV", "country_name": "Maldives", "region_type": "international", "route_key": "SHA-MLE", "hotel_key": "MLE" },
+    { "city_code": "DXB", "city_name": "Dubai", "country_code": "AE", "country_name": "UAE", "region_type": "international", "route_key": "SHA-DXB", "hotel_key": "DXB" },
+    { "city_code": "LHR", "city_name": "London", "country_code": "GB", "country_name": "United Kingdom", "region_type": "international", "route_key": "SHA-LHR", "hotel_key": "LHR" },
+    { "city_code": "CDG", "city_name": "Paris", "country_code": "FR", "country_name": "France", "region_type": "international", "route_key": "SHA-CDG", "hotel_key": "CDG" },
+    { "city_code": "LAX", "city_name": "Los Angeles", "country_code": "US", "country_name": "United States", "region_type": "international", "route_key": "SHA-LAX", "hotel_key": "LAX" },
+    { "city_code": "NYC", "city_name": "New York", "country_code": "US", "country_name": "United States", "region_type": "international", "route_key": "SHA-NYC", "hotel_key": "NYC" },
+    { "city_code": "SYD", "city_name": "Sydney", "country_code": "AU", "country_name": "Australia", "region_type": "international", "route_key": "SHA-SYD", "hotel_key": "SYD" }
+  ],
+  "routes": {
+    "SHA-BJS": {
+      "origin": "SHA",
+      "destination": "BJS",
+      "region_type": "domestic",
+      "flight_base_price": 980,
+      "flight_typical_min": 650,
+      "flight_typical_max": 1900,
+      "flight_duration_hours": 2.3,
+      "nonstop_ratio": 0.95,
+      "template_group": "china_short_haul"
+    },
+    "SHA-CTU": {
+      "origin": "SHA",
+      "destination": "CTU",
+      "region_type": "domestic",
+      "flight_base_price": 1180,
+      "flight_typical_min": 780,
+      "flight_typical_max": 2300,
+      "flight_duration_hours": 3.2,
+      "nonstop_ratio": 0.9,
+      "template_group": "china_medium_haul"
+    },
+    "SHA-XIY": {
+      "origin": "SHA",
+      "destination": "XIY",
+      "region_type": "domestic",
+      "flight_base_price": 980,
+      "flight_typical_min": 680,
+      "flight_typical_max": 1900,
+      "flight_duration_hours": 2.6,
+      "nonstop_ratio": 0.92,
+      "template_group": "china_short_haul"
+    },
+    "SHA-CKG": {
+      "origin": "SHA",
+      "destination": "CKG",
+      "region_type": "domestic",
+      "flight_base_price": 1080,
+      "flight_typical_min": 720,
+      "flight_typical_max": 2100,
+      "flight_duration_hours": 3.0,
+      "nonstop_ratio": 0.88,
+      "template_group": "china_medium_haul"
+    },
+    "SHA-CAN": {
+      "origin": "SHA",
+      "destination": "CAN",
+      "region_type": "domestic",
+      "flight_base_price": 980,
+      "flight_typical_min": 620,
+      "flight_typical_max": 1800,
+      "flight_duration_hours": 2.5,
+      "nonstop_ratio": 0.95,
+      "template_group": "china_short_haul"
+    },
+    "SHA-SZX": {
+      "origin": "SHA",
+      "destination": "SZX",
+      "region_type": "domestic",
+      "flight_base_price": 930,
+      "flight_typical_min": 580,
+      "flight_typical_max": 1750,
+      "flight_duration_hours": 2.4,
+      "nonstop_ratio": 0.95,
+      "template_group": "china_short_haul"
+    },
+    "SHA-KMG": {
+      "origin": "SHA",
+      "destination": "KMG",
+      "region_type": "domestic",
+      "flight_base_price": 1280,
+      "flight_typical_min": 850,
+      "flight_typical_max": 2400,
+      "flight_duration_hours": 3.8,
+      "nonstop_ratio": 0.84,
+      "template_group": "china_medium_haul"
+    },
+    "SHA-SYX": {
+      "origin": "SHA",
+      "destination": "SYX",
+      "region_type": "domestic",
+      "flight_base_price": 1580,
+      "flight_typical_min": 980,
+      "flight_typical_max": 3200,
+      "flight_duration_hours": 3.4,
+      "nonstop_ratio": 0.86,
+      "template_group": "china_medium_haul"
+    },
+    "SHA-DYG": {
+      "origin": "SHA",
+      "destination": "DYG",
+      "region_type": "domestic",
+      "flight_base_price": 1180,
+      "flight_typical_min": 780,
+      "flight_typical_max": 2200,
+      "flight_duration_hours": 2.4,
+      "nonstop_ratio": 0.72,
+      "template_group": "china_medium_haul"
+    },
+    "SHA-XMN": {
+      "origin": "SHA",
+      "destination": "XMN",
+      "region_type": "domestic",
+      "flight_base_price": 780,
+      "flight_typical_min": 480,
+      "flight_typical_max": 1500,
+      "flight_duration_hours": 1.8,
+      "nonstop_ratio": 0.96,
+      "template_group": "china_short_haul"
+    },
+    "SHA-HRB": {
+      "origin": "SHA",
+      "destination": "HRB",
+      "region_type": "domestic",
+      "flight_base_price": 1380,
+      "flight_typical_min": 880,
+      "flight_typical_max": 2500,
+      "flight_duration_hours": 3.1,
+      "nonstop_ratio": 0.87,
+      "template_group": "china_medium_haul"
+    },
+    "SHA-HKG": {
+      "origin": "SHA",
+      "destination": "HKG",
+      "region_type": "international",
+      "flight_base_price": 1680,
+      "flight_typical_min": 1200,
+      "flight_typical_max": 3000,
+      "flight_duration_hours": 2.8,
+      "nonstop_ratio": 0.93,
+      "template_group": "asia_short_haul"
+    },
+    "SHA-TYO": {
+      "origin": "SHA",
+      "destination": "TYO",
+      "region_type": "international",
+      "flight_base_price": 2280,
+      "flight_typical_min": 1600,
+      "flight_typical_max": 4200,
+      "flight_duration_hours": 3.2,
+      "nonstop_ratio": 0.88,
+      "template_group": "asia_short_haul"
+    },
+    "SHA-BKK": {
+      "origin": "SHA",
+      "destination": "BKK",
+      "region_type": "international",
+      "flight_base_price": 1980,
+      "flight_typical_min": 1450,
+      "flight_typical_max": 3600,
+      "flight_duration_hours": 4.4,
+      "nonstop_ratio": 0.85,
+      "template_group": "asia_medium_haul"
+    },
+    "SHA-SIN": {
+      "origin": "SHA",
+      "destination": "SIN",
+      "region_type": "international",
+      "flight_base_price": 2380,
+      "flight_typical_min": 1750,
+      "flight_typical_max": 4200,
+      "flight_duration_hours": 5.3,
+      "nonstop_ratio": 0.82,
+      "template_group": "asia_medium_haul"
+    },
+    "SHA-ICN": {
+      "origin": "SHA",
+      "destination": "ICN",
+      "region_type": "international",
+      "flight_base_price": 1780,
+      "flight_typical_min": 1250,
+      "flight_typical_max": 3200,
+      "flight_duration_hours": 2.2,
+      "nonstop_ratio": 0.9,
+      "template_group": "asia_short_haul"
+    },
+    "SHA-HGH": { "origin": "SHA", "destination": "HGH", "region_type": "domestic", "flight_base_price": 680, "flight_typical_min": 450, "flight_typical_max": 1400, "flight_duration_hours": 1.0, "nonstop_ratio": 0.96, "template_group": "china_short_haul" },
+    "SHA-NKG": { "origin": "SHA", "destination": "NKG", "region_type": "domestic", "flight_base_price": 720, "flight_typical_min": 480, "flight_typical_max": 1500, "flight_duration_hours": 1.1, "nonstop_ratio": 0.95, "template_group": "china_short_haul" },
+    "SHA-WUH": { "origin": "SHA", "destination": "WUH", "region_type": "domestic", "flight_base_price": 1050, "flight_typical_min": 680, "flight_typical_max": 2000, "flight_duration_hours": 1.8, "nonstop_ratio": 0.94, "template_group": "china_short_haul" },
+    "SHA-CSX": { "origin": "SHA", "destination": "CSX", "region_type": "domestic", "flight_base_price": 1280, "flight_typical_min": 820, "flight_typical_max": 2400, "flight_duration_hours": 2.1, "nonstop_ratio": 0.93, "template_group": "china_medium_haul" },
+    "SHA-TAO": { "origin": "SHA", "destination": "TAO", "region_type": "domestic", "flight_base_price": 900, "flight_typical_min": 600, "flight_typical_max": 1800, "flight_duration_hours": 1.5, "nonstop_ratio": 0.94, "template_group": "china_short_haul" },
+    "SHA-TSN": { "origin": "SHA", "destination": "TSN", "region_type": "domestic", "flight_base_price": 1100, "flight_typical_min": 720, "flight_typical_max": 2100, "flight_duration_hours": 2.1, "nonstop_ratio": 0.93, "template_group": "china_short_haul" },
+    "SHA-DLC": { "origin": "SHA", "destination": "DLC", "region_type": "domestic", "flight_base_price": 1150, "flight_typical_min": 750, "flight_typical_max": 2200, "flight_duration_hours": 2.0, "nonstop_ratio": 0.94, "template_group": "china_short_haul" },
+    "SHA-SHE": { "origin": "SHA", "destination": "SHE", "region_type": "domestic", "flight_base_price": 1380, "flight_typical_min": 880, "flight_typical_max": 2500, "flight_duration_hours": 2.4, "nonstop_ratio": 0.92, "template_group": "china_medium_haul" },
+    "SHA-HAK": { "origin": "SHA", "destination": "HAK", "region_type": "domestic", "flight_base_price": 1450, "flight_typical_min": 950, "flight_typical_max": 2800, "flight_duration_hours": 2.9, "nonstop_ratio": 0.92, "template_group": "china_medium_haul" },
+    "SHA-KWL": { "origin": "SHA", "destination": "KWL", "region_type": "domestic", "flight_base_price": 1480, "flight_typical_min": 980, "flight_typical_max": 2800, "flight_duration_hours": 2.6, "nonstop_ratio": 0.9, "template_group": "china_medium_haul" },
+    "SHA-LJG": { "origin": "SHA", "destination": "LJG", "region_type": "domestic", "flight_base_price": 1780, "flight_typical_min": 1100, "flight_typical_max": 3200, "flight_duration_hours": 4.2, "nonstop_ratio": 0.78, "template_group": "china_medium_haul" },
+    "SHA-LXA": { "origin": "SHA", "destination": "LXA", "region_type": "domestic", "flight_base_price": 2380, "flight_typical_min": 1550, "flight_typical_max": 4200, "flight_duration_hours": 5.8, "nonstop_ratio": 0.55, "template_group": "china_medium_haul" },
+    "SHA-URC": { "origin": "SHA", "destination": "URC", "region_type": "domestic", "flight_base_price": 2480, "flight_typical_min": 1650, "flight_typical_max": 4400, "flight_duration_hours": 5.4, "nonstop_ratio": 0.7, "template_group": "china_medium_haul" },
+    "SHA-MFM": { "origin": "SHA", "destination": "MFM", "region_type": "international", "flight_base_price": 1550, "flight_typical_min": 980, "flight_typical_max": 2900, "flight_duration_hours": 2.5, "nonstop_ratio": 0.85, "template_group": "asia_short_haul" },
+    "SHA-TPE": { "origin": "SHA", "destination": "TPE", "region_type": "international", "flight_base_price": 1680, "flight_typical_min": 1100, "flight_typical_max": 3100, "flight_duration_hours": 2.3, "nonstop_ratio": 0.88, "template_group": "asia_short_haul" },
+    "SHA-OSA": { "origin": "SHA", "destination": "OSA", "region_type": "international", "flight_base_price": 2180, "flight_typical_min": 1500, "flight_typical_max": 4000, "flight_duration_hours": 3.0, "nonstop_ratio": 0.9, "template_group": "asia_short_haul" },
+    "SHA-FUK": { "origin": "SHA", "destination": "FUK", "region_type": "international", "flight_base_price": 1980, "flight_typical_min": 1300, "flight_typical_max": 3600, "flight_duration_hours": 2.4, "nonstop_ratio": 0.87, "template_group": "asia_short_haul" },
+    "SHA-SPK": { "origin": "SHA", "destination": "SPK", "region_type": "international", "flight_base_price": 2380, "flight_typical_min": 1600, "flight_typical_max": 4200, "flight_duration_hours": 4.2, "nonstop_ratio": 0.78, "template_group": "asia_short_haul" },
+    "SHA-OKA": { "origin": "SHA", "destination": "OKA", "region_type": "international", "flight_base_price": 2080, "flight_typical_min": 1400, "flight_typical_max": 3800, "flight_duration_hours": 2.6, "nonstop_ratio": 0.82, "template_group": "asia_short_haul" },
+    "SHA-PUS": { "origin": "SHA", "destination": "PUS", "region_type": "international", "flight_base_price": 1680, "flight_typical_min": 1100, "flight_typical_max": 3100, "flight_duration_hours": 1.8, "nonstop_ratio": 0.85, "template_group": "asia_short_haul" },
+    "SHA-HAN": { "origin": "SHA", "destination": "HAN", "region_type": "international", "flight_base_price": 1880, "flight_typical_min": 1250, "flight_typical_max": 3500, "flight_duration_hours": 4.0, "nonstop_ratio": 0.82, "template_group": "asia_medium_haul" },
+    "SHA-SGN": { "origin": "SHA", "destination": "SGN", "region_type": "international", "flight_base_price": 1980, "flight_typical_min": 1350, "flight_typical_max": 3700, "flight_duration_hours": 5.0, "nonstop_ratio": 0.8, "template_group": "asia_medium_haul" },
+    "SHA-CNX": { "origin": "SHA", "destination": "CNX", "region_type": "international", "flight_base_price": 1880, "flight_typical_min": 1300, "flight_typical_max": 3500, "flight_duration_hours": 5.2, "nonstop_ratio": 0.6, "template_group": "asia_medium_haul" },
+    "SHA-HKT": { "origin": "SHA", "destination": "HKT", "region_type": "international", "flight_base_price": 2380, "flight_typical_min": 1700, "flight_typical_max": 4200, "flight_duration_hours": 5.5, "nonstop_ratio": 0.75, "template_group": "asia_medium_haul" },
+    "SHA-KUL": { "origin": "SHA", "destination": "KUL", "region_type": "international", "flight_base_price": 2280, "flight_typical_min": 1600, "flight_typical_max": 4100, "flight_duration_hours": 5.8, "nonstop_ratio": 0.82, "template_group": "asia_medium_haul" },
+    "SHA-DPS": { "origin": "SHA", "destination": "DPS", "region_type": "international", "flight_base_price": 2680, "flight_typical_min": 1900, "flight_typical_max": 4800, "flight_duration_hours": 7.2, "nonstop_ratio": 0.65, "template_group": "asia_medium_haul" },
+    "SHA-MNL": { "origin": "SHA", "destination": "MNL", "region_type": "international", "flight_base_price": 2180, "flight_typical_min": 1500, "flight_typical_max": 3900, "flight_duration_hours": 3.5, "nonstop_ratio": 0.85, "template_group": "asia_medium_haul" },
+    "SHA-MLE": { "origin": "SHA", "destination": "MLE", "region_type": "international", "flight_base_price": 3880, "flight_typical_min": 2600, "flight_typical_max": 6800, "flight_duration_hours": 9.5, "nonstop_ratio": 0.45, "template_group": "asia_medium_haul" },
+    "SHA-DXB": { "origin": "SHA", "destination": "DXB", "region_type": "international", "flight_base_price": 3880, "flight_typical_min": 2600, "flight_typical_max": 6600, "flight_duration_hours": 9.0, "nonstop_ratio": 0.82, "template_group": "international_long_haul" },
+    "SHA-LHR": { "origin": "SHA", "destination": "LHR", "region_type": "international", "flight_base_price": 5280, "flight_typical_min": 3600, "flight_typical_max": 9200, "flight_duration_hours": 12.5, "nonstop_ratio": 0.7, "template_group": "international_long_haul" },
+    "SHA-CDG": { "origin": "SHA", "destination": "CDG", "region_type": "international", "flight_base_price": 5180, "flight_typical_min": 3500, "flight_typical_max": 9000, "flight_duration_hours": 12.2, "nonstop_ratio": 0.72, "template_group": "international_long_haul" },
+    "SHA-LAX": { "origin": "SHA", "destination": "LAX", "region_type": "international", "flight_base_price": 5880, "flight_typical_min": 3800, "flight_typical_max": 10200, "flight_duration_hours": 11.5, "nonstop_ratio": 0.75, "template_group": "international_long_haul" },
+    "SHA-NYC": { "origin": "SHA", "destination": "NYC", "region_type": "international", "flight_base_price": 6480, "flight_typical_min": 4200, "flight_typical_max": 11500, "flight_duration_hours": 14.0, "nonstop_ratio": 0.6, "template_group": "international_long_haul" },
+    "SHA-SYD": { "origin": "SHA", "destination": "SYD", "region_type": "international", "flight_base_price": 5580, "flight_typical_min": 3700, "flight_typical_max": 9600, "flight_duration_hours": 10.5, "nonstop_ratio": 0.68, "template_group": "international_long_haul" }
+  },
+  "hotels": {
+    "BJS": {
+      "base_nightly": 520,
+      "typical_min": 300,
+      "typical_max": 1100
+    },
+    "CTU": {
+      "base_nightly": 360,
+      "typical_min": 180,
+      "typical_max": 780
+    },
+    "XIY": {
+      "base_nightly": 340,
+      "typical_min": 180,
+      "typical_max": 720
+    },
+    "CKG": {
+      "base_nightly": 320,
+      "typical_min": 170,
+      "typical_max": 680
+    },
+    "CAN": {
+      "base_nightly": 420,
+      "typical_min": 220,
+      "typical_max": 880
+    },
+    "SZX": {
+      "base_nightly": 430,
+      "typical_min": 240,
+      "typical_max": 920
+    },
+    "KMG": {
+      "base_nightly": 320,
+      "typical_min": 180,
+      "typical_max": 650
+    },
+    "SYX": {
+      "base_nightly": 720,
+      "typical_min": 380,
+      "typical_max": 1600
+    },
+    "DYG": {
+      "base_nightly": 360,
+      "typical_min": 200,
+      "typical_max": 760
+    },
+    "XMN": {
+      "base_nightly": 420,
+      "typical_min": 220,
+      "typical_max": 900
+    },
+    "HRB": {
+      "base_nightly": 330,
+      "typical_min": 180,
+      "typical_max": 700
+    },
+    "HKG": {
+      "base_nightly": 980,
+      "typical_min": 620,
+      "typical_max": 2200
+    },
+    "TYO": {
+      "base_nightly": 980,
+      "typical_min": 620,
+      "typical_max": 2200
+    },
+    "BKK": {
+      "base_nightly": 460,
+      "typical_min": 260,
+      "typical_max": 980
+    },
+    "SIN": {
+      "base_nightly": 1280,
+      "typical_min": 760,
+      "typical_max": 2600
+    },
+    "ICN": {
+      "base_nightly": 760,
+      "typical_min": 480,
+      "typical_max": 1600
+    },
+    "HGH": { "base_nightly": 460, "typical_min": 260, "typical_max": 950 },
+    "NKG": { "base_nightly": 400, "typical_min": 220, "typical_max": 850 },
+    "WUH": { "base_nightly": 360, "typical_min": 200, "typical_max": 750 },
+    "CSX": { "base_nightly": 340, "typical_min": 180, "typical_max": 720 },
+    "TAO": { "base_nightly": 460, "typical_min": 240, "typical_max": 950 },
+    "TSN": { "base_nightly": 420, "typical_min": 220, "typical_max": 880 },
+    "DLC": { "base_nightly": 440, "typical_min": 240, "typical_max": 900 },
+    "SHE": { "base_nightly": 330, "typical_min": 180, "typical_max": 700 },
+    "HAK": { "base_nightly": 540, "typical_min": 280, "typical_max": 1200 },
+    "KWL": { "base_nightly": 380, "typical_min": 200, "typical_max": 820 },
+    "LJG": { "base_nightly": 420, "typical_min": 220, "typical_max": 900 },
+    "LXA": { "base_nightly": 520, "typical_min": 280, "typical_max": 1100 },
+    "URC": { "base_nightly": 380, "typical_min": 200, "typical_max": 820 },
+    "MFM": { "base_nightly": 980, "typical_min": 580, "typical_max": 2200 },
+    "TPE": { "base_nightly": 780, "typical_min": 460, "typical_max": 1700 },
+    "OSA": { "base_nightly": 880, "typical_min": 540, "typical_max": 2000 },
+    "FUK": { "base_nightly": 780, "typical_min": 460, "typical_max": 1700 },
+    "SPK": { "base_nightly": 920, "typical_min": 560, "typical_max": 2100 },
+    "OKA": { "base_nightly": 760, "typical_min": 440, "typical_max": 1700 },
+    "PUS": { "base_nightly": 620, "typical_min": 360, "typical_max": 1400 },
+    "HAN": { "base_nightly": 460, "typical_min": 260, "typical_max": 1000 },
+    "SGN": { "base_nightly": 440, "typical_min": 240, "typical_max": 980 },
+    "CNX": { "base_nightly": 380, "typical_min": 200, "typical_max": 820 },
+    "HKT": { "base_nightly": 680, "typical_min": 360, "typical_max": 1600 },
+    "KUL": { "base_nightly": 520, "typical_min": 280, "typical_max": 1200 },
+    "DPS": { "base_nightly": 720, "typical_min": 380, "typical_max": 1700 },
+    "MNL": { "base_nightly": 480, "typical_min": 260, "typical_max": 1100 },
+    "MLE": { "base_nightly": 1680, "typical_min": 880, "typical_max": 3800 },
+    "DXB": { "base_nightly": 980, "typical_min": 560, "typical_max": 2300 },
+    "LHR": { "base_nightly": 1680, "typical_min": 1000, "typical_max": 3600 },
+    "CDG": { "base_nightly": 1580, "typical_min": 940, "typical_max": 3400 },
+    "LAX": { "base_nightly": 1480, "typical_min": 880, "typical_max": 3100 },
+    "NYC": { "base_nightly": 1880, "typical_min": 1100, "typical_max": 4200 },
+    "SYD": { "base_nightly": 1280, "typical_min": 760, "typical_max": 2800 }
+  },
+  "flight_price_rules": {
+    "departure_weekday_adjustment": {
+      "Mon": -80,
+      "Tue": -120,
+      "Wed": -100,
+      "Thu": -20,
+      "Fri": 180,
+      "Sat": 90,
+      "Sun": 120
+    },
+    "return_weekday_adjustment": {
+      "Mon": -30,
+      "Tue": -60,
+      "Wed": -70,
+      "Thu": -10,
+      "Fri": 90,
+      "Sat": 130,
+      "Sun": 220
+    },
+    "booking_window_adjustment": [
+      {
+        "min_days_before": 0,
+        "max_days_before": 3,
+        "adjustment": 420
+      },
+      {
+        "min_days_before": 4,
+        "max_days_before": 7,
+        "adjustment": 260
+      },
+      {
+        "min_days_before": 8,
+        "max_days_before": 14,
+        "adjustment": 140
+      },
+      {
+        "min_days_before": 15,
+        "max_days_before": 30,
+        "adjustment": 30
+      },
+      {
+        "min_days_before": 31,
+        "max_days_before": 60,
+        "adjustment": -50
+      },
+      {
+        "min_days_before": 61,
+        "max_days_before": 180,
+        "adjustment": -20
+      }
+    ],
+    "quality_adjustment": {
+      "nonstop": 120,
+      "one_stop": -80,
+      "two_stops": -180,
+      "red_eye": -120,
+      "midday_departure": 60,
+      "late_evening_arrival": -100,
+      "prime_return_window": 80
+    },
+    "region_multiplier": {
+      "domestic": 1,
+      "international": 1.12
+    },
+    "random_noise_range": {
+      "min": -80,
+      "max": 80
+    }
+  },
+  "hotel_price_rules": {
+    "weekday_adjustment": {
+      "Sun": -40,
+      "Mon": -60,
+      "Tue": -60,
+      "Wed": -30,
+      "Thu": 40,
+      "Fri": 120,
+      "Sat": 160
+    },
+    "length_of_stay_adjustment_per_night": [
+      {
+        "nights": 1,
+        "adjustment": 0
+      },
+      {
+        "nights": 2,
+        "adjustment": -10
+      },
+      {
+        "nights": 3,
+        "adjustment": -20
+      },
+      {
+        "nights": 4,
+        "adjustment": -30
+      },
+      {
+        "nights": 5,
+        "adjustment": -40
+      },
+      {
+        "nights": 6,
+        "adjustment": -45
+      }
+    ],
+    "special_destination_adjustment": {
+      "SYX": {
+        "Fri": 120,
+        "Sat": 220
+      },
+      "HKG": {
+        "Fri": 80,
+        "Sat": 120
+      },
+      "TYO": {
+        "Fri": 100,
+        "Sat": 140
+      },
+      "SIN": {
+        "Fri": 120,
+        "Sat": 160
+      },
+      "BKK": {
+        "Fri": 60,
+        "Sat": 80
+      },
+      "XMN": {
+        "Fri": 60,
+        "Sat": 90
+      }
+    },
+    "random_noise_range": {
+      "min": -35,
+      "max": 35
+    }
+  },
+  "seasonality_rules": {
+    "domestic": {
+      "major_holiday_window": 480,
+      "summer_peak": 140,
+      "winter_peak": 120,
+      "shoulder_season": 0,
+      "low_season": -80
+    },
+    "international": {
+      "major_holiday_window": 650,
+      "summer_peak": 220,
+      "winter_peak": 180,
+      "shoulder_season": 0,
+      "low_season": -100
+    },
+    "hotel_adjustment": {
+      "major_holiday_window": 220,
+      "summer_peak": 80,
+      "winter_peak": 70,
+      "shoulder_season": 0,
+      "low_season": -40
+    },
+    "special_month_adjustment": {
+      "SYX": {
+        "01": 220,
+        "02": 260,
+        "07": 120,
+        "08": 150,
+        "12": 180
+      },
+      "HRB": {
+        "12": 180,
+        "01": 240,
+        "02": 200
+      },
+      "HKG": {
+        "12": 120
+      },
+      "TYO": {
+        "03": 160,
+        "04": 180,
+        "11": 120
+      },
+      "BKK": {
+        "12": 180,
+        "01": 160
+      },
+      "SIN": {
+        "12": 160,
+        "01": 140
+      }
+    }
+  },
+  "holiday_rules": {
+    "china_public_holiday_keywords": [
+      "new_year",
+      "spring_festival",
+      "qingming",
+      "labor_day",
+      "dragon_boat",
+      "mid_autumn",
+      "national_day"
+    ],
+    "holiday_window_days": 3,
+    "pre_holiday_departure_surcharge": 180,
+    "last_day_return_surcharge": 220
+  },
+  "flight_time_templates": {
+    "china_short_haul": [
+      {
+        "template_id": "csh_good_morning",
+        "type": "good_morning",
+        "depart_time": "08:20",
+        "arrival_time_offset_hours": 2.3,
+        "stops": 0,
+        "layover_hours": 0
+      },
+      {
+        "template_id": "csh_midday",
+        "type": "midday",
+        "depart_time": "12:10",
+        "arrival_time_offset_hours": 2.3,
+        "stops": 0,
+        "layover_hours": 0
+      },
+      {
+        "template_id": "csh_evening_ok",
+        "type": "evening_ok",
+        "depart_time": "17:40",
+        "arrival_time_offset_hours": 2.4,
+        "stops": 0,
+        "layover_hours": 0
+      },
+      {
+        "template_id": "csh_budget_early",
+        "type": "budget_early",
+        "depart_time": "06:30",
+        "arrival_time_offset_hours": 2.3,
+        "stops": 0,
+        "layover_hours": 0
+      }
+    ],
+    "china_medium_haul": [
+      {
+        "template_id": "cmh_good_morning",
+        "type": "good_morning",
+        "depart_time": "08:40",
+        "arrival_time_offset_hours": 3.3,
+        "stops": 0,
+        "layover_hours": 0
+      },
+      {
+        "template_id": "cmh_midday",
+        "type": "midday",
+        "depart_time": "11:50",
+        "arrival_time_offset_hours": 3.4,
+        "stops": 0,
+        "layover_hours": 0
+      },
+      {
+        "template_id": "cmh_one_stop_budget",
+        "type": "one_stop_budget",
+        "depart_time": "07:15",
+        "arrival_time_offset_hours": 5.7,
+        "stops": 1,
+        "layover_hours": 1.6
+      },
+      {
+        "template_id": "cmh_late_arrival_budget",
+        "type": "late_arrival_budget",
+        "depart_time": "18:10",
+        "arrival_time_offset_hours": 4.1,
+        "stops": 0,
+        "layover_hours": 0
+      }
+    ],
+    "asia_short_haul": [
+      {
+        "template_id": "ash_daytime_nonstop",
+        "type": "daytime_nonstop",
+        "depart_time": "09:20",
+        "arrival_time_offset_hours": 3.1,
+        "stops": 0,
+        "layover_hours": 0
+      },
+      {
+        "template_id": "ash_midday_nonstop",
+        "type": "midday_nonstop",
+        "depart_time": "13:10",
+        "arrival_time_offset_hours": 3.0,
+        "stops": 0,
+        "layover_hours": 0
+      },
+      {
+        "template_id": "ash_budget_connection",
+        "type": "budget_connection",
+        "depart_time": "07:40",
+        "arrival_time_offset_hours": 6.2,
+        "stops": 1,
+        "layover_hours": 2.1
+      }
+    ],
+    "asia_medium_haul": [
+      {
+        "template_id": "amh_daytime_nonstop",
+        "type": "daytime_nonstop",
+        "depart_time": "09:50",
+        "arrival_time_offset_hours": 4.8,
+        "stops": 0,
+        "layover_hours": 0
+      },
+      {
+        "template_id": "amh_afternoon_nonstop",
+        "type": "afternoon_nonstop",
+        "depart_time": "14:10",
+        "arrival_time_offset_hours": 4.9,
+        "stops": 0,
+        "layover_hours": 0
+      },
+      {
+        "template_id": "amh_budget_connection",
+        "type": "budget_connection",
+        "depart_time": "07:00",
+        "arrival_time_offset_hours": 8.1,
+        "stops": 1,
+        "layover_hours": 2.6
+      }
+    ],
+    "international_long_haul": [
+      {
+        "template_id": "ilh_daytime_nonstop",
+        "type": "daytime_nonstop",
+        "depart_time": "10:40",
+        "arrival_time_offset_hours": 12,
+        "stops": 0,
+        "layover_hours": 0
+      },
+      {
+        "template_id": "ilh_evening_nonstop",
+        "type": "evening_nonstop",
+        "depart_time": "21:30",
+        "arrival_time_offset_hours": 12.5,
+        "stops": 0,
+        "layover_hours": 0
+      },
+      {
+        "template_id": "ilh_budget_connection",
+        "type": "budget_connection",
+        "depart_time": "01:45",
+        "arrival_time_offset_hours": 18,
+        "stops": 1,
+        "layover_hours": 3.5
+      }
+    ]
+  },
+  "return_time_templates": {
+    "default_short": [
+      {
+        "template_id": "rs_good_evening",
+        "type": "good_evening",
+        "depart_time": "18:30"
+      },
+      {
+        "template_id": "rs_mid_afternoon",
+        "type": "mid_afternoon",
+        "depart_time": "15:20"
+      },
+      {
+        "template_id": "rs_too_early_budget",
+        "type": "too_early_budget",
+        "depart_time": "07:10"
+      }
+    ],
+    "default_medium": [
+      {
+        "template_id": "rm_good_evening",
+        "type": "good_evening",
+        "depart_time": "19:00"
+      },
+      {
+        "template_id": "rm_afternoon",
+        "type": "afternoon",
+        "depart_time": "16:10"
+      },
+      {
+        "template_id": "rm_early_budget",
+        "type": "early_budget",
+        "depart_time": "07:40"
+      }
+    ],
+    "default_long": [
+      {
+        "template_id": "rl_evening",
+        "type": "evening",
+        "depart_time": "21:40"
+      },
+      {
+        "template_id": "rl_afternoon",
+        "type": "afternoon",
+        "depart_time": "16:30"
+      },
+      {
+        "template_id": "rl_morning_budget",
+        "type": "morning_budget",
+        "depart_time": "08:40"
+      }
+    ]
+  },
+  "template_mapping": {
+    "route_to_departure_group": {
+      "SHA-BJS": "china_short_haul",
+      "SHA-CTU": "china_medium_haul",
+      "SHA-XIY": "china_short_haul",
+      "SHA-CKG": "china_medium_haul",
+      "SHA-CAN": "china_short_haul",
+      "SHA-SZX": "china_short_haul",
+      "SHA-KMG": "china_medium_haul",
+      "SHA-SYX": "china_medium_haul",
+      "SHA-DYG": "china_medium_haul",
+      "SHA-XMN": "china_short_haul",
+      "SHA-HRB": "china_medium_haul",
+      "SHA-HKG": "asia_short_haul",
+      "SHA-TYO": "asia_short_haul",
+      "SHA-BKK": "asia_medium_haul",
+      "SHA-SIN": "asia_medium_haul",
+      "SHA-ICN": "asia_short_haul",
+      "SHA-HGH": "china_short_haul",
+      "SHA-NKG": "china_short_haul",
+      "SHA-WUH": "china_short_haul",
+      "SHA-CSX": "china_medium_haul",
+      "SHA-TAO": "china_short_haul",
+      "SHA-TSN": "china_short_haul",
+      "SHA-DLC": "china_short_haul",
+      "SHA-SHE": "china_medium_haul",
+      "SHA-HAK": "china_medium_haul",
+      "SHA-KWL": "china_medium_haul",
+      "SHA-LJG": "china_medium_haul",
+      "SHA-LXA": "china_medium_haul",
+      "SHA-URC": "china_medium_haul",
+      "SHA-MFM": "asia_short_haul",
+      "SHA-TPE": "asia_short_haul",
+      "SHA-OSA": "asia_short_haul",
+      "SHA-FUK": "asia_short_haul",
+      "SHA-SPK": "asia_short_haul",
+      "SHA-OKA": "asia_short_haul",
+      "SHA-PUS": "asia_short_haul",
+      "SHA-HAN": "asia_medium_haul",
+      "SHA-SGN": "asia_medium_haul",
+      "SHA-CNX": "asia_medium_haul",
+      "SHA-HKT": "asia_medium_haul",
+      "SHA-KUL": "asia_medium_haul",
+      "SHA-DPS": "asia_medium_haul",
+      "SHA-MNL": "asia_medium_haul",
+      "SHA-MLE": "asia_medium_haul",
+      "SHA-DXB": "international_long_haul",
+      "SHA-LHR": "international_long_haul",
+      "SHA-CDG": "international_long_haul",
+      "SHA-LAX": "international_long_haul",
+      "SHA-NYC": "international_long_haul",
+      "SHA-SYD": "international_long_haul"
+    },
+    "route_to_return_group": {
+      "SHA-BJS": "default_short",
+      "SHA-CTU": "default_medium",
+      "SHA-XIY": "default_short",
+      "SHA-CKG": "default_medium",
+      "SHA-CAN": "default_short",
+      "SHA-SZX": "default_short",
+      "SHA-KMG": "default_medium",
+      "SHA-SYX": "default_medium",
+      "SHA-DYG": "default_medium",
+      "SHA-XMN": "default_short",
+      "SHA-HRB": "default_medium",
+      "SHA-HKG": "default_short",
+      "SHA-TYO": "default_short",
+      "SHA-BKK": "default_medium",
+      "SHA-SIN": "default_medium",
+      "SHA-ICN": "default_short",
+      "SHA-HGH": "default_short",
+      "SHA-NKG": "default_short",
+      "SHA-WUH": "default_short",
+      "SHA-CSX": "default_medium",
+      "SHA-TAO": "default_short",
+      "SHA-TSN": "default_short",
+      "SHA-DLC": "default_short",
+      "SHA-SHE": "default_medium",
+      "SHA-HAK": "default_medium",
+      "SHA-KWL": "default_medium",
+      "SHA-LJG": "default_medium",
+      "SHA-LXA": "default_medium",
+      "SHA-URC": "default_medium",
+      "SHA-MFM": "default_short",
+      "SHA-TPE": "default_short",
+      "SHA-OSA": "default_short",
+      "SHA-FUK": "default_short",
+      "SHA-SPK": "default_short",
+      "SHA-OKA": "default_short",
+      "SHA-PUS": "default_short",
+      "SHA-HAN": "default_medium",
+      "SHA-SGN": "default_medium",
+      "SHA-CNX": "default_medium",
+      "SHA-HKT": "default_medium",
+      "SHA-KUL": "default_medium",
+      "SHA-DPS": "default_medium",
+      "SHA-MNL": "default_medium",
+      "SHA-MLE": "default_medium",
+      "SHA-DXB": "default_long",
+      "SHA-LHR": "default_long",
+      "SHA-CDG": "default_long",
+      "SHA-LAX": "default_long",
+      "SHA-NYC": "default_long",
+      "SHA-SYD": "default_long"
+    }
+  },
+  "effective_time_rules": {
+    "play_window_start": "09:00",
+    "play_window_end": "22:00",
+    "full_day_play_hours": 13,
+    "latest_arrival_time_default": "22:00",
+    "earliest_return_departure_default": "08:00",
+    "min_effective_play_hours": 10
+  },
+  "filter_defaults": {
+    "no_red_eye": true,
+    "max_layover_hours": 4,
+    "latest_arrival_time": "22:00",
+    "earliest_return_time": "08:00",
+    "prefer_nonstop": false
+  },
+  "experience_penalty_rules": {
+    "arrival_after_21_00": 18,
+    "arrival_after_20_00": 8,
+    "return_before_09_00": 20,
+    "return_before_10_00": 8,
+    "one_stop": 12,
+    "two_stops": 30,
+    "layover_over_2h": 10,
+    "layover_over_3h": 18
+  },
+  "price_clamp_rules": {
+    "flight_must_clamp_to_typical_range": true,
+    "hotel_must_clamp_to_typical_range": true
+  },
+  "sorting_targets": {
+    "cheapest_option": {
+      "primary": "total_price",
+      "direction": "asc"
+    },
+    "least_leave_option": {
+      "primary": "leave_days_used",
+      "secondary": "total_price",
+      "direction": "asc"
+    },
+    "best_value_option": {
+      "primary": "price_per_effective_hour_with_penalty",
+      "direction": "asc"
+    }
+  },
+  "seed_rules": {
+    "seed_key_format": "{origin}-{destination}-{depart_date}-{return_date}",
+    "use_seeded_random": true
+  },
+  "implementation_notes": {
+    "flight_price_formula": "flight_base_price + departure_weekday_adjustment + return_weekday_adjustment + booking_window_adjustment + quality_adjustment + seasonality_adjustment + holiday_adjustment + random_noise",
+    "hotel_nightly_formula": "base_nightly + hotel_weekday_adjustment + destination_special_adjustment + seasonality_hotel_adjustment + special_month_adjustment + length_of_stay_adjustment_per_night + random_noise",
+    "total_price_formula": "flight_total_price + hotel_total_price",
+    "value_formula": "total_price / effective_play_hours",
+    "value_formula_with_penalty": "(total_price / effective_play_hours) + experience_penalty_score"
+  }
+}
