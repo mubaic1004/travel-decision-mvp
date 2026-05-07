@@ -311,6 +311,71 @@ export const APP_COPY = {
       flightSummary: "Flight Summary",
       hotelSummary: "Hotel Summary",
     },
+    wizard: {
+      intro: {
+        cards: [
+          {
+            eyebrow: "Hello",
+            title: "I'm your trip planner.",
+            description:
+              "Tell me when you can travel and where you want to go — I'll work out the rest.",
+          },
+          {
+            eyebrow: "Three angles",
+            title: "Cheapest, least leave, best value.",
+            description:
+              "I run hundreds of date combos and surface the three picks worth comparing.",
+          },
+          {
+            eyebrow: "Ready?",
+            title: "A few quick questions.",
+            description: "Five short steps. Won't take long.",
+          },
+        ],
+        startButton: "Start →",
+      },
+      steps: {
+        origin: {
+          eyebrow: "Step 1 / 5",
+          title: "Where are you flying from?",
+          description: "City name in English or Chinese — I'll find the airport.",
+        },
+        destination: {
+          eyebrow: "Step 2 / 5",
+          title: "Where do you want to go?",
+          description: "One city is enough. I'll calculate every date combination.",
+        },
+        dates: {
+          eyebrow: "Step 3 / 5",
+          title: "When can you travel?",
+          description: "Pick the earliest and latest you could be away.",
+        },
+        duration: {
+          eyebrow: "Step 4 / 5",
+          title: "How long, and how much leave?",
+          description: "Trip length range and max leave days you'd like to use.",
+        },
+        preferences: {
+          eyebrow: "Step 5 / 5",
+          title: "Any flying preferences?",
+          description:
+            "Optional. Skip if defaults work — I'll filter out red-eye flights and unfriendly schedules.",
+        },
+      },
+      nav: {
+        back: "Back",
+        next: "Next",
+        skip: "Skip",
+        submit: "Show me three options",
+        loading: "Calculating...",
+      },
+      progress: (current: number, total: number) => `${current} / ${total}`,
+      result: {
+        eyebrow: "Three for you",
+        title: "Pick the one you like best.",
+        replanButton: "Plan again",
+      },
+    },
   },
   zh: {
     language: {
@@ -503,6 +568,71 @@ export const APP_COPY = {
       travelLens: "判断维度",
       flightSummary: "航班摘要",
       hotelSummary: "酒店摘要",
+    },
+    wizard: {
+      intro: {
+        cards: [
+          {
+            eyebrow: "你好",
+            title: "我是出发助手。",
+            description:
+              "告诉我你想什么时候、去哪儿，剩下的我帮你算清楚。",
+          },
+          {
+            eyebrow: "三个角度",
+            title: "最省钱、最省假、最划算。",
+            description:
+              "我会跑一遍上百种日期组合，挑三个真正值得对比的方案。",
+          },
+          {
+            eyebrow: "准备好了吗？",
+            title: "几个小问题，慢慢来。",
+            description: "总共五步，几分钟搞定。",
+          },
+        ],
+        startButton: "开始 →",
+      },
+      steps: {
+        origin: {
+          eyebrow: "第 1 步 / 共 5 步",
+          title: "你从哪儿出发？",
+          description: "中英文都行，我会帮你找到对应机场。",
+        },
+        destination: {
+          eyebrow: "第 2 步 / 共 5 步",
+          title: "想去哪儿？",
+          description: "填一个城市就行，我会把不同日期组合都算一遍。",
+        },
+        dates: {
+          eyebrow: "第 3 步 / 共 5 步",
+          title: "什么时候可以出发？",
+          description: "选一个最早和最晚都能接受的日期。",
+        },
+        duration: {
+          eyebrow: "第 4 步 / 共 5 步",
+          title: "想玩几天？最多请几天假？",
+          description: "给我一个旅行天数的上下限，再说说能请的最多天数。",
+        },
+        preferences: {
+          eyebrow: "第 5 步 / 共 5 步",
+          title: "对航班还有什么讲究？",
+          description:
+            "这步是可选的。不填也能用默认值帮你避开红眼和不顺心的时间。",
+        },
+      },
+      nav: {
+        back: "上一步",
+        next: "下一步",
+        skip: "跳过",
+        submit: "看看三个方案",
+        loading: "正在算...",
+      },
+      progress: (current: number, total: number) => `${current} / ${total}`,
+      result: {
+        eyebrow: "三个方案，挑一个",
+        title: "看看哪个最合心意",
+        replanButton: "重新规划一次",
+      },
     },
   },
 } as const;

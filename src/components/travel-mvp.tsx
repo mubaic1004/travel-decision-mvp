@@ -2,45 +2,48 @@
 
 import { useEffect, useState } from "react";
 
+import { IntroCards } from "@/components/wizard/intro-cards";
+import { ResultScreen } from "@/components/wizard/result-screen";
+import { StepDates } from "@/components/wizard/step-dates";
+import { StepDestination } from "@/components/wizard/step-destination";
+import { StepDuration } from "@/components/wizard/step-duration";
+import { StepOrigin } from "@/components/wizard/step-origin";
+import { StepPreferences } from "@/components/wizard/step-preferences";
+import { WizardShell } from "@/components/wizard/wizard-shell";
+import { DEFAULT_SEARCH_FORM_VALUES } from "@/lib/constants";
 import {
   APP_COPY,
   LOCALE_OPTIONS,
   isLocale,
   type Locale,
 } from "@/lib/i18n";
-import { ResultCard } from "@/components/result-card";
-import { SearchForm } from "@/components/search-form";
-import { LoadingCards, StatePanel } from "@/components/state-panel";
+import {
+  STEP_ORDER,
+  toSearchInput,
+  validateAll,
+  validateStep,
+  type FormErrors,
+  type StepKey,
+} from "@/lib/wizard/step-validation";
 import { searchTripOptions } from "@/lib/travel/search";
-import type { SearchInput, SearchResult } from "@/types/travel";
+import type { SearchFormValues, SearchResult } from "@/types/travel";
 
-type ViewState = "idle" | "loading" | "success" | "empty" | "error";
+type Phase = "intro" | StepKey | "result";
+
+type ViewState = "loading" | "success" | "empty" | "error";
 
 const LOCALE_STORAGE_KEY = "travel-decision-locale";
 
 export function TravelMvp() {
   const [locale, setLocale] = useState<Locale>("zh");
-  const [viewState, setViewState] = useState<ViewState>("idle");
+  const [phase, setPhase] = useState<Phase>("intro");
+  const [values, setValues] = useState<SearchFormValues>(DEFAULT_SEARCH_FORM_VALUES);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [viewState, setViewState] = useState<ViewState>("loading");
   const [results, setResults] = useState<SearchResult | null>(null);
 
   const copy = APP_COPY[locale];
-  const resultCards = [
-    {
-      ...copy.options.cheapest,
-      key: "cheapestOption" as const,
-      sequence: "01",
-    },
-    {
-      ...copy.options.leastLeave,
-      key: "leastLeaveOption" as const,
-      sequence: "02",
-    },
-    {
-      ...copy.options.bestValue,
-      key: "bestValueOption" as const,
-      sequence: "03",
-    },
-  ];
+  const wizardCopy = copy.wizard;
 
   useEffect(() => {
     const savedLocale = window.localStorage.getItem(LOCALE_STORAGE_KEY);
@@ -54,13 +57,67 @@ export function TravelMvp() {
     document.documentElement.lang = locale === "zh" ? "zh-CN" : "en";
   }, [locale]);
 
-  async function handleSearch(input: SearchInput) {
-    setViewState("loading");
+  function updateValue<Key extends keyof SearchFormValues>(
+    key: Key,
+    value: SearchFormValues[Key],
+  ) {
+    setValues((current) => ({ ...current, [key]: value }));
+    setErrors((current) => ({ ...current, [key]: undefined, form: undefined }));
+  }
 
+  function goToStep(index: number) {
+    const next = STEP_ORDER[index];
+    if (next) {
+      setPhase(next);
+      setErrors({});
+    }
+  }
+
+  function handleStepNext(stepKey: StepKey) {
+    const stepErrors = validateStep(stepKey, values, copy.form);
+    if (Object.keys(stepErrors).length > 0) {
+      setErrors(stepErrors);
+      return;
+    }
+    setErrors({});
+    const currentIndex = STEP_ORDER.indexOf(stepKey);
+    if (currentIndex < STEP_ORDER.length - 1) {
+      setPhase(STEP_ORDER[currentIndex + 1]);
+    } else {
+      void runSearch();
+    }
+  }
+
+  function handleStepBack(stepKey: StepKey) {
+    const currentIndex = STEP_ORDER.indexOf(stepKey);
+    setErrors({});
+    if (currentIndex === 0) {
+      setPhase("intro");
+    } else {
+      setPhase(STEP_ORDER[currentIndex - 1]);
+    }
+  }
+
+  async function runSearch() {
+    const fullErrors = validateAll(values, copy.form);
+    if (Object.keys(fullErrors).length > 0) {
+      // Jump back to first failing step
+      const firstFailing = STEP_ORDER.find(
+        (step) => Object.keys(validateStep(step, values, copy.form)).length > 0,
+      );
+      if (firstFailing) {
+        setPhase(firstFailing);
+        setErrors(fullErrors);
+      }
+      return;
+    }
+
+    setPhase("result");
+    setViewState("loading");
     try {
-      const nextResults = await searchTripOptions(input);
-      setResults(nextResults);
-      setViewState(nextResults.evaluatedOptions.length > 0 ? "success" : "empty");
+      const next = await searchTripOptions(toSearchInput(values));
+      setResults(next);
+      setViewState(next.evaluatedOptions.length > 0 ? "success" : "empty");
     } catch (error) {
       console.error(error);
       setResults(null);
@@ -68,134 +125,176 @@ export function TravelMvp() {
     }
   }
 
+  function handleReplan() {
+    setPhase(STEP_ORDER[0]);
+    setErrors({});
+  }
+
+  // Locale switcher kept on intro screen only, top-right corner.
+  const localeSwitcher = (
+    <div className="locale-switcher absolute right-4 top-4 sm:right-6 sm:top-6">
+      <span className="locale-switcher-label">{copy.language.label}</span>
+      <div className="locale-switcher-buttons">
+        {LOCALE_OPTIONS.map((option) => (
+          <button
+            className={`locale-button ${locale === option.value ? "locale-button-active" : ""}`}
+            key={option.value}
+            onClick={() => setLocale(option.value)}
+            type="button"
+          >
+            {option.value === "en" ? copy.language.english : copy.language.chinese}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  const total = STEP_ORDER.length;
+
   return (
     <main className="min-h-screen overflow-x-hidden">
-      <div className="mx-auto max-w-[1500px] px-4 pb-16 pt-5 sm:px-6 lg:px-8">
-        <section className="relative mb-6 overflow-hidden rounded-[42px] border border-stone-200/80 bg-[linear-gradient(135deg,rgba(252,248,243,0.99)_0%,rgba(248,242,234,0.97)_42%,rgba(239,244,240,0.95)_100%)] p-6 text-stone-950 shadow-[0_24px_64px_rgba(72,55,30,0.06)] sm:p-8">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_20%,rgba(229,216,191,0.42),transparent_26%),radial-gradient(circle_at_18%_82%,rgba(151,171,156,0.18),transparent_24%)]" />
-          <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(186,160,117,0.5),transparent)]" />
+      <div className="relative">
+        {phase === "intro" ? (
+          <>
+            {localeSwitcher}
+            <IntroCards copy={wizardCopy.intro} onStart={() => goToStep(0)} />
+          </>
+        ) : null}
 
-          <div className="relative">
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-              <div className="max-w-3xl">
-                <p className="text-[11px] uppercase tracking-[0.34em] text-[#ccb07a]">
-                  {copy.hero.eyebrow}
-                </p>
-                <h1 className="font-rounded-display hero-title-lively mt-4 text-[2.2rem] font-normal leading-[1.15] sm:text-[2.8rem] lg:text-[3.3rem]">
-                  {copy.hero.title}
-                </h1>
-                <p className="mt-4 max-w-2xl text-sm leading-7 text-stone-600 sm:text-base">
-                  {copy.hero.description}
-                </p>
-              </div>
-
-              <div className="self-start">
-                <div className="locale-switcher">
-                  <span className="locale-switcher-label">{copy.language.label}</span>
-                  <div className="locale-switcher-buttons">
-                    {LOCALE_OPTIONS.map((option) => (
-                      <button
-                        className={`locale-button ${locale === option.value ? "locale-button-active" : ""}`}
-                        key={option.value}
-                        onClick={() => setLocale(option.value)}
-                        type="button"
-                      >
-                        {option.value === "en"
-                          ? copy.language.english
-                          : copy.language.chinese}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        <section className="workspace-shell">
-          <div className="grid gap-6 xl:grid-cols-[470px_minmax(0,1fr)]">
-            <SearchForm
-              copy={copy.form}
-              isLoading={viewState === "loading"}
-              onSearch={handleSearch}
+        {phase === "origin" ? (
+          <WizardShell
+            current={1}
+            description={wizardCopy.steps.origin.description}
+            error={errors.form}
+            eyebrow={wizardCopy.steps.origin.eyebrow}
+            navCopy={wizardCopy.nav}
+            onBack={() => handleStepBack("origin")}
+            onNext={() => handleStepNext("origin")}
+            progressLabel={wizardCopy.progress(1, total)}
+            title={wizardCopy.steps.origin.title}
+            total={total}
+          >
+            <StepOrigin
+              fieldError={errors.originCity}
+              fieldLabel={copy.form.fields.originCity}
+              formCopy={copy.form}
+              onChange={(value) => updateValue("originCity", value)}
+              placeholder={copy.form.placeholders.originCity}
+              value={values.originCity}
             />
+          </WizardShell>
+        ) : null}
 
-            <section className="space-y-5">
-              <article className="section-spotlight">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                  <div>
-                    <p className="section-eyebrow eyebrow-gold">{copy.board.eyebrow}</p>
-                    <h2 className="font-rounded-display mt-3 text-[1.85rem] font-normal leading-[1.2] text-stone-900">
-                      {copy.board.title}
-                    </h2>
-                    <p className="mt-2 text-sm leading-6 text-stone-600">
-                      {copy.board.description}
-                    </p>
-                  </div>
+        {phase === "destination" ? (
+          <WizardShell
+            current={2}
+            description={wizardCopy.steps.destination.description}
+            error={errors.form}
+            eyebrow={wizardCopy.steps.destination.eyebrow}
+            navCopy={wizardCopy.nav}
+            onBack={() => handleStepBack("destination")}
+            onNext={() => handleStepNext("destination")}
+            progressLabel={wizardCopy.progress(2, total)}
+            title={wizardCopy.steps.destination.title}
+            total={total}
+          >
+            <StepDestination
+              fieldError={errors.destinations}
+              fieldLabel={copy.form.fields.destinations}
+              hint={copy.form.destinationsHint}
+              onChange={(value) => updateValue("destinations", value)}
+              placeholder={copy.form.placeholders.destinations}
+              value={values.destinations}
+            />
+          </WizardShell>
+        ) : null}
 
-                  <div className="flex flex-wrap gap-2 text-sm">
-                    <span className="soft-pill">{copy.board.chips.price}</span>
-                    <span className="soft-pill">{copy.board.chips.leaveDays}</span>
-                    <span className="soft-pill">{copy.board.chips.effectiveHours}</span>
-                  </div>
-                </div>
+        {phase === "dates" ? (
+          <WizardShell
+            current={3}
+            description={wizardCopy.steps.dates.description}
+            error={errors.form}
+            eyebrow={wizardCopy.steps.dates.eyebrow}
+            navCopy={wizardCopy.nav}
+            onBack={() => handleStepBack("dates")}
+            onNext={() => handleStepNext("dates")}
+            progressLabel={wizardCopy.progress(3, total)}
+            title={wizardCopy.steps.dates.title}
+            total={total}
+          >
+            <StepDates
+              endError={errors.dateRangeEnd}
+              endValue={values.dateRangeEnd}
+              fields={copy.form.fields}
+              onEndChange={(value) => updateValue("dateRangeEnd", value)}
+              onStartChange={(value) => updateValue("dateRangeStart", value)}
+              startValue={values.dateRangeStart}
+            />
+          </WizardShell>
+        ) : null}
 
-                <div className="mt-5 luxury-rule" />
+        {phase === "duration" ? (
+          <WizardShell
+            current={4}
+            description={wizardCopy.steps.duration.description}
+            error={errors.form}
+            eyebrow={wizardCopy.steps.duration.eyebrow}
+            navCopy={wizardCopy.nav}
+            onBack={() => handleStepBack("duration")}
+            onNext={() => handleStepNext("duration")}
+            progressLabel={wizardCopy.progress(4, total)}
+            title={wizardCopy.steps.duration.title}
+            total={total}
+          >
+            <StepDuration
+              errors={errors}
+              fields={copy.form.fields}
+              maxLeaveDays={values.maxLeaveDays}
+              onChange={(key, value) => updateValue(key, value)}
+              tripLengthMax={values.tripLengthMax}
+              tripLengthMin={values.tripLengthMin}
+            />
+          </WizardShell>
+        ) : null}
 
-                <div className="mt-4 rounded-[26px] border border-stone-200/80 bg-white/[0.72] px-4 py-3 text-sm text-stone-600">
-                  {results?.evaluatedOptions.length
-                    ? copy.board.evaluated(results.evaluatedOptions.length)
-                    : copy.board.empty}
-                </div>
-              </article>
+        {phase === "preferences" ? (
+          <WizardShell
+            current={5}
+            description={wizardCopy.steps.preferences.description}
+            error={errors.form}
+            eyebrow={wizardCopy.steps.preferences.eyebrow}
+            isLoading={false}
+            navCopy={wizardCopy.nav}
+            nextLabel={wizardCopy.nav.submit}
+            onBack={() => handleStepBack("preferences")}
+            onNext={() => handleStepNext("preferences")}
+            onSkip={() => void runSearch()}
+            progressLabel={wizardCopy.progress(5, total)}
+            title={wizardCopy.steps.preferences.title}
+            total={total}
+          >
+            <StepPreferences
+              earliestReturnTime={values.earliestReturnTime}
+              errors={errors}
+              fields={copy.form.fields}
+              latestArrivalTime={values.latestArrivalTime}
+              maxLayoverHours={values.maxLayoverHours}
+              noRedEye={values.noRedEye}
+              noRedEyeLabel={copy.form.noRedEye}
+              onChange={(key, value) => updateValue(key, value as never)}
+            />
+          </WizardShell>
+        ) : null}
 
-              {viewState === "idle" ? (
-                <StatePanel
-                  description={copy.states.idleDescription}
-                  eyebrow={copy.states.waitingEyebrow}
-                  title={copy.states.idleTitle}
-                />
-              ) : null}
-
-              {viewState === "loading" ? <LoadingCards /> : null}
-
-              {viewState === "empty" ? (
-                <StatePanel
-                  description={copy.states.emptyDescription}
-                  eyebrow={copy.states.waitingEyebrow}
-                  title={copy.states.emptyTitle}
-                />
-              ) : null}
-
-              {viewState === "error" ? (
-                <StatePanel
-                  description={copy.states.errorDescription}
-                  eyebrow={copy.states.errorEyebrow}
-                  title={copy.states.errorTitle}
-                  tone="error"
-                />
-              ) : null}
-
-              {viewState === "success" && results ? (
-                <div className="grid gap-5 xl:grid-cols-3">
-                  {resultCards.map((card) => (
-                    <ResultCard
-                      copy={copy.card}
-                      key={card.key}
-                      locale={locale}
-                      option={results[card.key]}
-                      sequence={card.sequence}
-                      shortLabel={card.short}
-                      subtitle={card.subtitle}
-                      title={card.title}
-                    />
-                  ))}
-                </div>
-              ) : null}
-            </section>
-          </div>
-        </section>
+        {phase === "result" ? (
+          <ResultScreen
+            copy={copy}
+            locale={locale}
+            onReplan={handleReplan}
+            results={results}
+            viewState={viewState}
+          />
+        ) : null}
       </div>
     </main>
   );
