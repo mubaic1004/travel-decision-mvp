@@ -117,11 +117,11 @@ function synthesizeRoute(
     durationHours = Math.max(1, distance / 800 + 0.5);
     departureGroup = distance < 1500 ? "china_short_haul" : "china_medium_haul";
   } else if (distance < 3500) {
-    basePrice = 2200 + distance * 0.85;
+    basePrice = 1800 + distance * 0.75;
     durationHours = Math.max(1.5, distance / 850 + 0.6);
     departureGroup = "asia_short_haul";
   } else if (distance < 7500) {
-    basePrice = 3200 + distance * 0.7;
+    basePrice = 2900 + distance * 0.65;
     durationHours = distance / 880 + 1.0;
     departureGroup = "asia_medium_haul";
   } else {
