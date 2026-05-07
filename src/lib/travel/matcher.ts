@@ -13,66 +13,18 @@ import type {
 
 import { pricingRules } from "@/lib/travel/pricing-rules";
 import {
+  CITIES,
+  type CityMeta,
+  distanceKm,
+  resolveCity,
+} from "@/lib/travel/cities";
+import {
   addDays,
   formatDateInput,
   hashString,
-  normalizeText,
-  timeToMinutes,
   toLocalDate,
+  timeToMinutes,
 } from "@/lib/travel/utils";
-
-const DESTINATION_ALIASES: Record<string, string[]> = {
-  BJS: ["beijing", "北京", "PEK", "PKX"],
-  CTU: ["chengdu", "成都", "TFU"],
-  XIY: ["xi'an", "xian", "西安"],
-  CKG: ["chongqing", "重庆"],
-  CAN: ["guangzhou", "广州"],
-  SZX: ["shenzhen", "深圳"],
-  KMG: ["kunming", "昆明"],
-  SYX: ["sanya", "三亚"],
-  DYG: ["zhangjiajie", "张家界"],
-  XMN: ["xiamen", "厦门"],
-  HRB: ["harbin", "哈尔滨"],
-  HGH: ["hangzhou", "杭州"],
-  NKG: ["nanjing", "南京"],
-  WUH: ["wuhan", "武汉"],
-  CSX: ["changsha", "长沙"],
-  TAO: ["qingdao", "青岛"],
-  TSN: ["tianjin", "天津"],
-  DLC: ["dalian", "大连"],
-  SHE: ["shenyang", "沈阳"],
-  HAK: ["haikou", "海口"],
-  KWL: ["guilin", "桂林"],
-  LJG: ["lijiang", "丽江"],
-  LXA: ["lhasa", "拉萨"],
-  URC: ["urumqi", "乌鲁木齐"],
-  HKG: ["hong kong", "hongkong", "香港"],
-  MFM: ["macau", "macao", "澳门"],
-  TPE: ["taipei", "台北", "台湾", "taiwan", "TSA"],
-  TYO: ["tokyo", "东京", "HND", "NRT"],
-  OSA: ["osaka", "大阪", "KIX", "ITM"],
-  FUK: ["fukuoka", "福冈"],
-  SPK: ["sapporo", "札幌", "CTS"],
-  OKA: ["okinawa", "冲绳", "那霸", "naha"],
-  ICN: ["seoul", "首尔", "GMP"],
-  PUS: ["busan", "釜山"],
-  BKK: ["bangkok", "曼谷", "DMK"],
-  HAN: ["hanoi", "河内"],
-  SGN: ["ho chi minh", "saigon", "胡志明", "西贡"],
-  CNX: ["chiang mai", "清迈"],
-  HKT: ["phuket", "普吉", "普吉岛"],
-  SIN: ["singapore", "新加坡"],
-  KUL: ["kuala lumpur", "吉隆坡"],
-  DPS: ["bali", "denpasar", "巴厘", "巴厘岛"],
-  MNL: ["manila", "马尼拉"],
-  MLE: ["maldives", "male", "马尔代夫", "马累"],
-  DXB: ["dubai", "迪拜"],
-  LHR: ["london", "伦敦", "LGW", "STN"],
-  CDG: ["paris", "巴黎", "ORY"],
-  LAX: ["los angeles", "洛杉矶"],
-  NYC: ["new york", "纽约", "JFK", "EWR", "LGA"],
-  SYD: ["sydney", "悉尼"],
-};
 
 const HOLIDAY_ANCHORS: Record<number, string[]> = {
   2025: [
@@ -103,31 +55,6 @@ const HOLIDAY_ANCHORS: Record<number, string[]> = {
     "2027-10-01",
   ],
 };
-
-const destinationLookup = new Map<string, SupportedDestinationRule>();
-const supportedOriginAliases = new Set<string>(
-  [
-    pricingRules.base_origin.city_code,
-    pricingRules.base_origin.city_name,
-    ...pricingRules.base_origin.airports,
-    "上海",
-    "上海虹桥",
-    "上海浦东",
-  ].map(normalizeText),
-);
-
-for (const destination of pricingRules.supported_destinations) {
-  const aliases = new Set<string>([
-    destination.city_code,
-    destination.city_name,
-    destination.route_key,
-    ...(DESTINATION_ALIASES[destination.city_code] ?? []),
-  ]);
-
-  for (const alias of aliases) {
-    destinationLookup.set(normalizeText(alias), destination);
-  }
-}
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -169,27 +96,96 @@ function seededInteger(seedKey: string, min: number, max: number): number {
   return Math.round(min + ratio * (max - min));
 }
 
-function isSupportedOrigin(originCity: string): boolean {
-  return supportedOriginAliases.has(normalizeText(originCity));
+// Synthesize a route on-the-fly when the origin/destination pair isn't curated
+// in pricing-rules.json. Calibrated roughly against the existing Shanghai
+// curated data so the relative ranking (cheapest/medium/long-haul) stays sensible.
+function synthesizeRoute(
+  origin: CityMeta,
+  destination: CityMeta,
+): { route: RoutePricingRule; departureGroup: string; returnGroup: string } {
+  const distance = distanceKm(origin, destination);
+  const isInternational =
+    origin.regionType === "international" ||
+    destination.regionType === "international";
+
+  let basePrice: number;
+  let durationHours: number;
+  let departureGroup: string;
+
+  if (!isInternational) {
+    basePrice = 450 + distance * 0.5;
+    durationHours = Math.max(1, distance / 800 + 0.5);
+    departureGroup = distance < 1500 ? "china_short_haul" : "china_medium_haul";
+  } else if (distance < 3500) {
+    basePrice = 2200 + distance * 0.85;
+    durationHours = Math.max(1.5, distance / 850 + 0.6);
+    departureGroup = "asia_short_haul";
+  } else if (distance < 7500) {
+    basePrice = 3200 + distance * 0.7;
+    durationHours = distance / 880 + 1.0;
+    departureGroup = "asia_medium_haul";
+  } else {
+    basePrice = 4500 + distance * 0.65;
+    durationHours = distance / 900 + 1.5;
+    departureGroup = "international_long_haul";
+  }
+
+  // Tier premium/discount: hub-to-hub cheaper, secondary routes pricier.
+  const avgTier = (origin.tier + destination.tier) / 2;
+  if (avgTier <= 1.5) {
+    basePrice *= 0.92;
+  } else if (avgTier >= 2.5) {
+    basePrice *= 1.18;
+  }
+
+  basePrice = Math.round(basePrice / 50) * 50;
+  const flightTypicalMin = Math.max(300, Math.round((basePrice * 0.65) / 50) * 50);
+  const flightTypicalMax = Math.round((basePrice * 1.95) / 50) * 50;
+  const returnGroup = distance > 6000 ? "default_long" : "default_short";
+
+  return {
+    route: {
+      origin: origin.code,
+      destination: destination.code,
+      region_type: isInternational ? "international" : "domestic",
+      flight_base_price: basePrice,
+      flight_typical_min: flightTypicalMin,
+      flight_typical_max: flightTypicalMax,
+      flight_duration_hours: Number(durationHours.toFixed(1)),
+      nonstop_ratio: distance < 4000 ? 0.85 : 0.5,
+      template_group: departureGroup,
+    },
+    departureGroup,
+    returnGroup,
+  };
 }
 
-function resolveDestination(destination: string): SupportedDestinationRule | null {
-  return destinationLookup.get(normalizeText(destination)) ?? null;
+function destinationRuleFromCity(
+  origin: CityMeta,
+  city: CityMeta,
+): SupportedDestinationRule {
+  return {
+    city_code: city.code,
+    city_name: city.name,
+    country_code: city.countryCode,
+    country_name: city.countryCode,
+    region_type: city.regionType,
+    route_key: `${origin.code}-${city.code}`,
+    hotel_key: city.hotelKey,
+  };
 }
 
 function getDestinationDisplayName(
   rawDestination: string,
-  destination: SupportedDestinationRule,
+  destination: CityMeta,
 ): string {
   const trimmed = rawDestination.trim();
   if (!trimmed) {
-    return destination.city_name;
+    return destination.name;
   }
-
-  if (normalizeText(trimmed) === normalizeText(destination.city_code)) {
-    return destination.city_name;
+  if (trimmed.toLowerCase() === destination.code.toLowerCase()) {
+    return destination.name;
   }
-
   return trimmed;
 }
 
@@ -396,12 +392,28 @@ function getHotelName(destination: SupportedDestinationRule): string {
   return `${destination.city_name} ${suffix}`;
 }
 
+// Synthesize a hotel pricing rule for cities not present in pricing-rules.json
+// (right now only Shanghai falls in this gap, since it was originally an origin only).
+function synthesizeHotelRule(city: CityMeta): HotelPricingRule {
+  const tierBase: Record<1 | 2 | 3, number> = { 1: 720, 2: 540, 3: 420 };
+  const intlBoost = city.regionType === "international" ? 1.45 : 1;
+  const baseNightly = Math.round((tierBase[city.tier] * intlBoost) / 10) * 10;
+  return {
+    base_nightly: baseNightly,
+    typical_min: Math.round((baseNightly * 0.6) / 10) * 10,
+    typical_max: Math.round((baseNightly * 2.0) / 10) * 10,
+  };
+}
+
 function getHotelOption(
   trip: CandidateTrip,
   destination: SupportedDestinationRule,
+  destCity: CityMeta,
   displayDestination: string,
 ): HotelOption {
-  const hotelRule = pricingRules.hotels[destination.hotel_key] as HotelPricingRule;
+  const hotelRule =
+    (pricingRules.hotels[destination.hotel_key] as HotelPricingRule | undefined) ??
+    synthesizeHotelRule(destCity);
   const hotelNights = Math.max(1, trip.totalTripDays - 1);
   const lengthAdjustment = getHotelLengthOfStayAdjustment(hotelNights);
   let hotelTotalPrice = 0;
@@ -471,7 +483,7 @@ function formatFlightLabel(
 }
 
 function getFlightOption(
-  input: SearchInput,
+  origin: CityMeta,
   trip: CandidateTrip,
   destination: SupportedDestinationRule,
   displayDestination: string,
@@ -487,10 +499,8 @@ function getFlightOption(
   const isRedEye = isRedEyeFlight(outboundDeparture, outboundArrival, returnDeparture);
 
   return {
-    id: `${destination.route_key}-${trip.departDate}-${trip.returnDate}-${outboundTemplate.template_id}-${returnTemplate.template_id}`,
-    originCity: isSupportedOrigin(input.originCity)
-      ? pricingRules.base_origin.city_name
-      : input.originCity,
+    id: `${origin.code}-${destination.city_code}-${trip.departDate}-${trip.returnDate}-${outboundTemplate.template_id}-${returnTemplate.template_id}`,
+    originCity: origin.name,
     destination: displayDestination,
     label: formatFlightLabel(outboundTemplate, returnTemplate),
     outboundDeparture: formatLocalDateTime(outboundDeparture),
@@ -511,11 +521,29 @@ function getFlightOption(
   };
 }
 
+function lookupRouteForOriginDest(
+  origin: CityMeta,
+  destination: CityMeta,
+): { route: RoutePricingRule; departureGroup: string; returnGroup: string } {
+  const routeKey = `${origin.code}-${destination.code}`;
+  const curatedRoute = pricingRules.routes[routeKey] as RoutePricingRule | undefined;
+  if (curatedRoute) {
+    const departureGroup =
+      pricingRules.template_mapping.route_to_departure_group[routeKey] ??
+      curatedRoute.template_group;
+    const returnGroup =
+      pricingRules.template_mapping.route_to_return_group[routeKey] ?? "default_short";
+    return { route: curatedRoute, departureGroup, returnGroup };
+  }
+  return synthesizeRoute(origin, destination);
+}
+
 export function matchTripData(
   input: SearchInput,
   candidateTrips: CandidateTrip[],
 ): MatchedTripOption[] {
-  if (!isSupportedOrigin(input.originCity)) {
+  const origin = resolveCity(input.originCity);
+  if (!origin) {
     return [];
   }
 
@@ -523,34 +551,36 @@ export function matchTripData(
   const seenKeys = new Set<string>();
 
   for (const trip of candidateTrips) {
-    const destination = resolveDestination(trip.destination);
-    if (!destination) {
+    const destCity = resolveCity(trip.destination);
+    if (!destCity) {
+      continue;
+    }
+    if (destCity.code === origin.code) {
       continue;
     }
 
-    const route = pricingRules.routes[destination.route_key] as RoutePricingRule | undefined;
-    if (!route) {
-      continue;
-    }
+    const destinationRule = destinationRuleFromCity(origin, destCity);
+    const { route, departureGroup, returnGroup } = lookupRouteForOriginDest(
+      origin,
+      destCity,
+    );
 
-    const departureGroup =
-      pricingRules.template_mapping.route_to_departure_group[destination.route_key] ??
-      route.template_group;
-    const returnGroup =
-      pricingRules.template_mapping.route_to_return_group[destination.route_key] ??
-      "default_short";
     const outboundTemplates = pricingRules.flight_time_templates[departureGroup] ?? [];
     const returnTemplates = pricingRules.return_time_templates[returnGroup] ?? [];
-    const displayDestination = getDestinationDisplayName(trip.destination, destination);
+    if (outboundTemplates.length === 0 || returnTemplates.length === 0) {
+      continue;
+    }
+
+    const displayDestination = getDestinationDisplayName(trip.destination, destCity);
     const canonicalTrip: CandidateTrip = {
       ...trip,
       destination: displayDestination,
     };
-    const hotel = getHotelOption(canonicalTrip, destination, displayDestination);
+    const hotel = getHotelOption(canonicalTrip, destinationRule, destCity, displayDestination);
 
     for (const outboundTemplate of outboundTemplates) {
       for (const returnTemplate of returnTemplates) {
-        const key = `${destination.route_key}-${trip.departDate}-${trip.returnDate}-${outboundTemplate.template_id}-${returnTemplate.template_id}`;
+        const key = `${origin.code}-${destCity.code}-${trip.departDate}-${trip.returnDate}-${outboundTemplate.template_id}-${returnTemplate.template_id}`;
         if (seenKeys.has(key)) {
           continue;
         }
@@ -559,9 +589,9 @@ export function matchTripData(
         matchedTrips.push({
           candidateTrip: canonicalTrip,
           flight: getFlightOption(
-            input,
+            origin,
             canonicalTrip,
-            destination,
+            destinationRule,
             displayDestination,
             route,
             outboundTemplate,
@@ -575,3 +605,7 @@ export function matchTripData(
 
   return matchedTrips;
 }
+
+// Re-export for any downstream code that previously imported these helpers.
+export { resolveCity, CITIES };
+export type { CityMeta };
