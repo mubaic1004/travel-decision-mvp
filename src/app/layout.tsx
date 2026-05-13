@@ -23,7 +23,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className={roundedDisplay.variable}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <footer className="border-t border-stone-200/70 bg-stone-50/60 py-5 text-center text-xs text-stone-500">
+          <a
+            className="transition hover:text-stone-700"
+            href="https://beian.miit.gov.cn/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            沪ICP备2026019934号
+          </a>
+        </footer>
+      </body>
     </html>
   );
 }
