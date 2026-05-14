@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { ResultCard } from "@/components/result-card";
 import { LoadingCards, StatePanel } from "@/components/state-panel";
 import type { AppCopy, Locale } from "@/lib/i18n";
@@ -43,13 +45,21 @@ export function ResultScreen({
           ) : null}
         </div>
 
-        <button
-          className="self-start rounded-full border border-stone-300 bg-white/70 px-5 py-2.5 text-sm text-stone-700 transition hover:border-stone-400 hover:text-stone-900 sm:self-end"
-          onClick={onReplan}
-          type="button"
-        >
-          ↺ {copy.wizard.result.replanButton}
-        </button>
+        <div className="flex flex-wrap items-center gap-3 self-start sm:self-end">
+          <Link
+            className="rounded-full border border-stone-300 bg-white/70 px-5 py-2.5 text-sm text-stone-700 transition hover:border-stone-400 hover:text-stone-900"
+            href="/"
+          >
+            ← 首页
+          </Link>
+          <button
+            className="rounded-full border border-stone-300 bg-white/70 px-5 py-2.5 text-sm text-stone-700 transition hover:border-stone-400 hover:text-stone-900"
+            onClick={onReplan}
+            type="button"
+          >
+            ↺ {copy.wizard.result.replanButton}
+          </button>
+        </div>
       </div>
 
       {viewState === "loading" ? <LoadingCards /> : null}

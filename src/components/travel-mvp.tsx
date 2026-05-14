@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { IntroCards } from "@/components/wizard/intro-cards";
@@ -156,6 +157,12 @@ export function TravelMvp() {
       <div className="relative">
         {phase === "intro" ? (
           <>
+            <Link
+              className="absolute left-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white/70 px-3 py-1.5 text-[11px] uppercase tracking-[0.24em] text-stone-500 backdrop-blur transition hover:border-stone-300 hover:text-stone-900 sm:left-6 sm:top-6"
+              href="/"
+            >
+              ← chenmubai.cn
+            </Link>
             {localeSwitcher}
             <IntroCards copy={wizardCopy.intro} onStart={() => goToStep(0)} />
           </>

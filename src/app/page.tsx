@@ -1,5 +1,5 @@
-import { TravelMvp } from "@/components/travel-mvp";
+import { Home } from "@/components/landing/home";
 
-export default function Home() {
-  return <TravelMvp />;
+export default function Page() {
+  return <Home />;
 }
