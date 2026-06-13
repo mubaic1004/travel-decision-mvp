@@ -42,7 +42,7 @@ export default function RootLayout({
     >
       <body>
         {children}
-        <footer className="border-t border-stone-200/70 bg-stone-50/60 py-5 text-center text-xs text-stone-500">
+        <footer className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-stone-200/70 bg-stone-50/60 py-5 text-center text-xs text-stone-500">
           <a
             className="transition hover:text-stone-700"
             href="https://beian.miit.gov.cn/"
@@ -50,6 +50,14 @@ export default function RootLayout({
             target="_blank"
           >
             沪ICP备2026019934号
+          </a>
+          <a
+            className="transition hover:text-stone-700"
+            href="https://beian.mps.gov.cn/#/query/webSearch?code=31011502406091"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            沪公网安备31011502406091号
           </a>
         </footer>
       </body>
