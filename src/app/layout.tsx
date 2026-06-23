@@ -1,27 +1,20 @@
 import type { Metadata } from "next";
-import { Fraunces, Noto_Serif_SC, ZCOOL_KuaiLe } from "next/font/google";
+import { Anton_SC, Space_Mono } from "next/font/google";
 
 import "@/app/globals.css";
 
-const roundedDisplay = ZCOOL_KuaiLe({
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-space-mono",
+  display: "swap",
+});
+
+const antonDisplay = Anton_SC({
   subsets: ["latin"],
   weight: "400",
-  variable: "--font-rounded-display",
-  display: "swap",
-});
-
-const serifDisplay = Noto_Serif_SC({
-  subsets: ["latin"],
-  weight: ["300", "400", "500"],
-  variable: "--font-serif-display",
-  display: "swap",
-});
-
-const serifItalic = Fraunces({
-  subsets: ["latin"],
-  weight: ["300", "400"],
-  style: "italic",
-  variable: "--font-serif-italic",
+  variable: "--font-anton",
   display: "swap",
 });
 
@@ -38,13 +31,13 @@ export default function RootLayout({
   return (
     <html
       lang="zh-CN"
-      className={`${roundedDisplay.variable} ${serifDisplay.variable} ${serifItalic.variable}`}
+      className={`${spaceMono.variable} ${antonDisplay.variable}`}
     >
       <body>
         {children}
-        <footer className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 border-t border-stone-200/70 bg-stone-50/60 py-5 text-center text-xs text-stone-500">
+        <footer className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 border-t border-white/10 bg-black py-6 text-center text-[11px] uppercase tracking-[0.18em] text-white/30">
           <a
-            className="transition hover:text-stone-700"
+            className="transition hover:text-white/70"
             href="https://beian.miit.gov.cn/"
             rel="noopener noreferrer"
             target="_blank"
@@ -52,7 +45,7 @@ export default function RootLayout({
             沪ICP备2026019934号
           </a>
           <a
-            className="transition hover:text-stone-700"
+            className="transition hover:text-white/70"
             href="https://beian.mps.gov.cn/#/query/webSearch?code=31011502406091"
             rel="noopener noreferrer"
             target="_blank"

@@ -7,7 +7,14 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ['"Space Mono"', "monospace"],
+        serif: ['"Space Mono"', "monospace"],
+        mono: ['"Space Mono"', "monospace"],
+        display: ['"Anton SC"', "sans-serif"],
+      },
+    },
   },
   plugins: [],
 };

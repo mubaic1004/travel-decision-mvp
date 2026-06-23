@@ -10,8 +10,7 @@ const formatter = new Intl.DateTimeFormat("zh-CN", {
   timeZone: "Asia/Shanghai",
 });
 
-// Live Shanghai time, ticking once per second. Renders nothing until mounted
-// so the static HTML stays consistent with SSR output.
+// Live Shanghai time, ticking once per second.
 export function LiveClock() {
   const [time, setTime] = useState<string | null>(null);
 
@@ -25,10 +24,10 @@ export function LiveClock() {
   return (
     <span
       aria-label="当前上海时间"
-      className="font-serif-italic tabular-nums text-stone-400 transition-opacity"
+      className="tabular-nums text-white/40 transition-opacity"
       style={{ opacity: time ? 1 : 0 }}
     >
-      Shanghai · {time ?? "00:00:00"}
+      SHANGHAI · {time ?? "00:00:00"}
     </span>
   );
 }

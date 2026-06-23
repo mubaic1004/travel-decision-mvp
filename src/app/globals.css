@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --page-background: #f6f1e9;
-  --panel-background: rgba(255, 252, 247, 0.82);
-  --panel-border: rgba(120, 99, 69, 0.09);
-  --panel-shadow: 0 24px 70px rgba(74, 57, 31, 0.06);
+  --font-mono-stack:
+    var(--font-space-mono), "Space Mono", "SFMono-Regular", "Menlo", "Consolas",
+    ui-monospace, monospace;
+  --font-display-stack: var(--font-anton), "Anton SC", "Arial Narrow", sans-serif;
 }
 
 * {
@@ -17,87 +17,16 @@ html {
   scroll-behavior: smooth;
 }
 
-.font-serif-display {
-  font-family:
-    var(--font-serif-display),
-    "Noto Serif SC",
-    "Songti SC",
-    "PingFang SC",
-    "Hiragino Mincho ProN",
-    serif;
-  letter-spacing: -0.005em;
-}
-
-.font-serif-italic {
-  font-family:
-    var(--font-serif-italic),
-    "Fraunces",
-    "Times New Roman",
-    serif;
-  font-style: italic;
-  font-feature-settings: "ss01" on;
-}
-
-.font-rounded-display {
-  font-family:
-    var(--font-rounded-display),
-    "ZCOOL KuaiLe",
-    "ui-rounded",
-    "SF Pro Rounded",
-    "PingFang SC",
-    "Hiragino Sans GB",
-    "Microsoft YaHei",
-    system-ui,
-    sans-serif;
-  letter-spacing: 0.01em;
-}
-
-.hero-title-lively {
-  background: linear-gradient(
-    108deg,
-    #c78a3e 0%,
-    #1c1917 36%,
-    #1c1917 70%,
-    #7a9480 100%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-
-.hero-title-lively::after {
-  content: "✈";
-  display: inline-block;
-  margin-left: 0.28em;
-  font-size: 0.62em;
-  color: #c78a3e;
-  -webkit-text-fill-color: #c78a3e;
-  transform: translateY(-0.1em) rotate(-12deg);
-}
-
+html,
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.98), transparent 26%),
-    radial-gradient(circle at 86% 10%, rgba(210, 223, 214, 0.42), transparent 17%),
-    radial-gradient(circle at 16% 18%, rgba(231, 221, 204, 0.35), transparent 24%),
-    linear-gradient(180deg, #fbf7f1 0%, #f6f1e9 54%, #fcfaf6 100%);
-  color: #1c1917;
-  font-family:
-    "ui-rounded",
-    "Nunito",
-    "SF Pro Rounded",
-    "Avenir Next Rounded",
-    "Arial Rounded MT Bold",
-    "PingFang SC",
-    "Hiragino Sans GB",
-    "Microsoft YaHei",
-    "Helvetica Neue",
-    ui-sans-serif,
-    system-ui,
-    sans-serif;
+  background: #000;
+  color: #fff;
+  overflow-x: hidden;
+  font-family: var(--font-mono-stack);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1,
@@ -108,182 +37,157 @@ h5,
 h6,
 button,
 input,
-textarea {
-  font-family:
-    "ui-rounded",
-    "Nunito",
-    "SF Pro Rounded",
-    "Avenir Next Rounded",
-    "Arial Rounded MT Bold",
-    "PingFang SC",
-    "Hiragino Sans GB",
-    "Microsoft YaHei",
-    "Helvetica Neue",
-    ui-sans-serif,
-    system-ui,
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+textarea,
+select {
+  font-family: var(--font-mono-stack);
+}
+
+.font-display {
+  font-family: var(--font-display-stack);
+  letter-spacing: -0.02em;
+}
+
+/* Legacy alias kept so older components don't break during migration. */
+.font-rounded-display {
+  font-family: var(--font-mono-stack);
+  letter-spacing: -0.01em;
+}
+
+/* Dot-grid overlay used on dark sections. */
+.dot-grid {
+  background-image: radial-gradient(#ffffff 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.05;
+}
+
+/* Slow-drifting gradient mesh that replaces the reference's hero video. */
+.aurora-bg {
+  background:
+    radial-gradient(60% 50% at 18% 22%, rgba(142, 127, 148, 0.28), transparent 70%),
+    radial-gradient(50% 45% at 82% 18%, rgba(86, 110, 120, 0.22), transparent 70%),
+    radial-gradient(70% 60% at 70% 85%, rgba(120, 100, 130, 0.20), transparent 72%),
+    #010103;
+  background-size: 200% 200%, 200% 200%, 200% 200%, 100% 100%;
+  animation: aurora-drift 26s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-drift {
+  0% {
+    background-position: 0% 0%, 100% 0%, 50% 100%, 0 0;
+  }
+  50% {
+    background-position: 40% 30%, 60% 40%, 30% 60%, 0 0;
+  }
+  100% {
+    background-position: 100% 60%, 0% 80%, 80% 20%, 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-bg {
+    animation: none;
+  }
+}
+
+.hero-title-lively {
+  color: #fff;
 }
 
 @layer components {
-  .panel {
-    @apply rounded-[34px] border backdrop-blur-xl;
-    border-color: var(--panel-border);
-    background: var(--panel-background);
-    box-shadow: var(--panel-shadow);
+  .section-eyebrow {
+    @apply text-[11px] font-normal uppercase tracking-[0.22em] text-white/40;
   }
 
-  .panel-form {
-    background:
-      linear-gradient(180deg, rgba(255, 253, 249, 0.98) 0%, rgba(249, 243, 235, 0.92) 100%);
-  }
-
-  .hero-panel {
-    @apply rounded-[32px] border p-5 sm:p-6;
-    border-color: rgba(120, 99, 69, 0.08);
-    background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 242, 234, 0.96) 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.7),
-      0 14px 30px rgba(67, 50, 28, 0.04);
-  }
-
-  .form-section {
-    @apply rounded-[32px] border p-5 sm:p-6;
-    border-color: rgba(120, 99, 69, 0.08);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(255, 250, 244, 0.76) 100%);
+  .eyebrow-gold {
+    @apply text-white/40;
   }
 
   .field-label {
-    @apply mb-2 block text-sm font-medium text-stone-700;
+    @apply mb-2 block text-[11px] font-normal uppercase tracking-[0.18em] text-white/45;
   }
 
   .field-input {
-    @apply w-full rounded-[24px] border px-4 py-3 text-sm text-stone-900 outline-none transition;
-    border-color: rgba(120, 99, 69, 0.1);
-    background: rgba(255, 255, 255, 0.96);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.74),
-      0 1px 1px rgba(80, 59, 27, 0.02);
-    @apply focus:border-stone-400 focus:ring-4 focus:ring-stone-200/50;
+    @apply w-full rounded-none border-0 border-b bg-transparent px-0 py-3 text-base text-white outline-none transition;
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .field-input::placeholder {
+    color: rgba(255, 255, 255, 0.28);
+  }
+
+  .field-input:focus {
+    border-color: rgba(255, 255, 255, 0.7);
+  }
+
+  .field-input[type="date"],
+  .field-input[type="time"] {
+    color-scheme: dark;
   }
 
   .hint-text {
-    @apply text-xs leading-5 text-stone-500;
+    @apply text-xs leading-5 text-white/35;
   }
 
-  .section-eyebrow {
-    @apply text-[11px] font-medium uppercase tracking-[0.2em] text-stone-500;
+  .panel {
+    @apply rounded-2xl border;
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .soft-pill {
-    @apply inline-flex items-center rounded-full border px-3.5 py-1.5 text-xs font-medium;
-    border-color: rgba(120, 99, 69, 0.1);
-    background: rgba(255, 255, 255, 0.76);
-    color: #44403c;
-  }
-
-  .soft-pill-dark {
-    border-color: rgba(255, 241, 214, 0.18);
-    background: rgba(255, 248, 238, 0.08);
-    color: #e7e5e4;
+    @apply inline-flex items-center rounded-full border px-3.5 py-1.5 text-xs;
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
   }
 
   .snapshot-tile {
-    @apply rounded-[24px] border p-4;
-    border-color: rgba(120, 99, 69, 0.08);
-    background: rgba(255, 255, 255, 0.78);
+    @apply rounded-xl border p-4;
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .snapshot-label {
-    @apply text-[11px] uppercase tracking-[0.18em] text-stone-500;
+    @apply text-[11px] uppercase tracking-[0.18em] text-white/40;
   }
 
   .primary-button {
-    @apply inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-medium text-white transition;
-    background: linear-gradient(135deg, #9ab09b 0%, #7d967f 100%);
-    box-shadow: 0 16px 30px rgba(92, 114, 94, 0.2);
+    @apply inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-normal text-black transition;
   }
 
   .primary-button:hover {
-    background: linear-gradient(135deg, #8ca38d 0%, #708872 100%);
+    background: #e2e2e6;
   }
 
   .primary-button:disabled {
     @apply cursor-not-allowed;
-    background: #a8a29e;
-    box-shadow: none;
-  }
-
-  .action-dock {
-    @apply flex flex-col gap-4 rounded-[30px] border p-4 sm:flex-row sm:items-center sm:justify-between;
-    border-color: rgba(164, 144, 115, 0.1);
-    background: linear-gradient(145deg, rgba(248, 242, 234, 0.98) 0%, rgba(241, 235, 227, 0.98) 100%);
-    box-shadow: 0 18px 36px rgba(93, 73, 44, 0.07);
-    backdrop-filter: blur(18px);
-  }
-
-  .luxury-rule {
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, rgba(122, 98, 61, 0.28) 18%, rgba(122, 98, 61, 0.28) 82%, transparent 100%);
-  }
-
-  .eyebrow-gold {
-    color: #8b6d3f;
-  }
-
-  .glass-card {
-    background: rgba(255, 255, 255, 0.62);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.65),
-      0 12px 24px rgba(70, 52, 24, 0.04);
-  }
-
-  .workspace-shell {
-    @apply rounded-[40px] border p-3 sm:p-4 lg:p-5;
-    border-color: rgba(120, 99, 69, 0.08);
-    background:
-      linear-gradient(180deg, rgba(255, 253, 249, 0.72) 0%, rgba(249, 243, 235, 0.64) 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.7),
-      0 20px 48px rgba(74, 57, 31, 0.05);
-  }
-
-  .section-spotlight {
-    @apply rounded-[32px] border p-5 sm:p-6;
-    border-color: rgba(120, 99, 69, 0.08);
-    background:
-      linear-gradient(145deg, rgba(255, 255, 255, 0.94) 0%, rgba(248, 242, 234, 0.88) 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.7),
-      0 14px 32px rgba(70, 52, 24, 0.04);
+    background: rgba(255, 255, 255, 0.3);
+    color: rgba(0, 0, 0, 0.5);
   }
 
   .locale-switcher {
     @apply inline-flex items-center gap-3 rounded-full border px-3 py-2;
-    border-color: rgba(120, 99, 69, 0.08);
-    background: rgba(255, 252, 247, 0.78);
-    box-shadow: 0 8px 18px rgba(68, 49, 22, 0.04);
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
   }
 
   .locale-switcher-label {
-    @apply text-[11px] uppercase tracking-[0.22em] text-stone-500;
+    @apply text-[11px] uppercase tracking-[0.22em] text-white/40;
   }
 
   .locale-switcher-buttons {
     @apply inline-flex rounded-full border p-1;
-    border-color: rgba(120, 99, 69, 0.08);
-    background: rgba(255, 255, 255, 0.82);
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
   }
 
   .locale-button {
-    @apply rounded-full px-3 py-1 text-xs font-medium text-stone-600 transition;
+    @apply rounded-full px-3 py-1 text-xs font-normal text-white/55 transition;
   }
 
   .locale-button-active {
-    background: #a8bbab;
-    color: #fbf7f0;
+    background: #ffffff;
+    color: #000;
   }
 }
