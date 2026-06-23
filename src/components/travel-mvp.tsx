@@ -153,12 +153,14 @@ export function TravelMvp() {
   const total = STEP_ORDER.length;
 
   return (
-    <main className="min-h-screen overflow-x-hidden">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#010103]">
+      <div className="aurora-bg pointer-events-none fixed inset-0" />
+      <div className="dot-grid pointer-events-none fixed inset-0" />
       <div className="relative">
         {phase === "intro" ? (
           <>
             <Link
-              className="absolute left-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-white/70 px-3 py-1.5 text-[11px] uppercase tracking-[0.24em] text-stone-500 backdrop-blur transition hover:border-stone-300 hover:text-stone-900 sm:left-6 sm:top-6"
+              className="absolute left-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1.5 text-[11px] uppercase tracking-[0.24em] text-white/50 backdrop-blur transition hover:border-white/30 hover:text-white sm:left-6 sm:top-6"
               href="/"
             >
               ← chenmubai.cn

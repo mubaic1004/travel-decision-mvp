@@ -29,11 +29,11 @@ export function StepPreferences({
 }: StepPreferencesProps) {
   return (
     <div className="space-y-5">
-      <div className="rounded-[24px] border border-stone-200 bg-white/[0.82] px-4 py-4">
-        <label className="flex items-center gap-3 text-sm font-medium text-stone-800" htmlFor="noRedEye">
+      <div className="rounded-lg border border-white/10 bg-white/[0.03] px-4 py-4">
+        <label className="flex items-center gap-3 text-sm font-normal text-white/80" htmlFor="noRedEye">
           <input
             checked={noRedEye}
-            className="h-4 w-4 rounded border-stone-300 text-stone-950 focus:ring-stone-300"
+            className="h-4 w-4 rounded border-white/30 bg-transparent accent-white"
             id="noRedEye"
             name="noRedEye"
             onChange={(event) => onChange("noRedEye", event.target.checked)}

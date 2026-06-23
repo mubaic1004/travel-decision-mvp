@@ -42,30 +42,30 @@ export function WizardShell({
   return (
     <div className="mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-2xl flex-col px-4 pb-10 pt-6 sm:px-6">
       <div className="mb-6">
-        <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.32em] text-[#c4ab7a]">
+        <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.28em] text-white/40">
           <span>{eyebrow}</span>
           <span>{progressLabel}</span>
         </div>
-        <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-stone-200/70">
+        <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-white/10">
           <div
-            className="h-full rounded-full bg-[linear-gradient(90deg,#c78a3e,#93a895)] transition-[width] duration-500 ease-out"
+            className="h-full rounded-full bg-white transition-[width] duration-500 ease-out"
             style={{ width: `${progressRatio}%` }}
           />
         </div>
       </div>
 
       <div className="flex-1">
-        <h2 className="font-rounded-display text-[2rem] font-normal leading-[1.18] text-stone-950 sm:text-[2.6rem]">
+        <h2 className="text-[2rem] font-normal leading-[1.18] tracking-[-0.02em] text-white sm:text-[2.6rem]">
           {title}
         </h2>
-        <p className="mt-3 text-sm leading-7 text-stone-600 sm:text-base">
+        <p className="mt-3 text-sm leading-7 text-white/55 sm:text-base">
           {description}
         </p>
 
         <div className="mt-8">{children}</div>
 
         {error ? (
-          <div className="mt-6 rounded-[20px] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <div className="mt-6 rounded-lg border border-rose-400/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">
             {error}
           </div>
         ) : null}
@@ -73,7 +73,7 @@ export function WizardShell({
 
       <div className="mt-10 flex items-center justify-between gap-3">
         <button
-          className="rounded-full px-4 py-2.5 text-sm text-stone-500 transition hover:text-stone-800 disabled:invisible"
+          className="rounded-full px-4 py-2.5 text-sm text-white/45 transition hover:text-white disabled:invisible"
           disabled={!onBack}
           onClick={onBack}
           type="button"
@@ -84,7 +84,7 @@ export function WizardShell({
         <div className="flex items-center gap-2">
           {onSkip ? (
             <button
-              className="rounded-full px-4 py-2.5 text-sm text-stone-500 transition hover:text-stone-800"
+              className="rounded-full px-4 py-2.5 text-sm text-white/45 transition hover:text-white"
               onClick={onSkip}
               type="button"
             >
@@ -92,7 +92,7 @@ export function WizardShell({
             </button>
           ) : null}
           <button
-            className="inline-flex items-center justify-center rounded-full bg-[#93a895] px-6 py-3 text-sm font-medium text-white transition hover:bg-[#7f957f] disabled:cursor-not-allowed disabled:bg-stone-300"
+            className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-normal text-black transition hover:bg-[#e2e2e6] disabled:cursor-not-allowed disabled:bg-white/30 disabled:text-black/50"
             disabled={isLoading}
             onClick={onNext}
             type="button"

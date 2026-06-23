@@ -34,12 +34,12 @@ export function ResultScreen({
     <div className="mx-auto w-full max-w-[1300px] px-4 pb-16 pt-6 sm:px-6 lg:px-8">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="section-eyebrow eyebrow-gold">{copy.wizard.result.eyebrow}</p>
-          <h2 className="font-rounded-display mt-3 text-[2rem] font-normal leading-[1.18] text-stone-950 sm:text-[2.6rem]">
+          <p className="section-eyebrow">{copy.wizard.result.eyebrow}</p>
+          <h2 className="mt-3 text-[2rem] font-normal leading-[1.18] tracking-[-0.02em] text-white sm:text-[2.6rem]">
             {copy.wizard.result.title}
           </h2>
           {viewState === "success" && results ? (
-            <p className="mt-3 text-sm text-stone-600">
+            <p className="mt-3 text-sm text-white/50">
               {copy.board.evaluated(results.evaluatedOptions.length)}
             </p>
           ) : null}
@@ -47,13 +47,13 @@ export function ResultScreen({
 
         <div className="flex flex-wrap items-center gap-3 self-start sm:self-end">
           <Link
-            className="rounded-full border border-stone-300 bg-white/70 px-5 py-2.5 text-sm text-stone-700 transition hover:border-stone-400 hover:text-stone-900"
+            className="rounded-full border border-white/15 bg-white/[0.04] px-5 py-2.5 text-sm text-white/70 transition hover:border-white/30 hover:text-white"
             href="/"
           >
             ← 首页
           </Link>
           <button
-            className="rounded-full border border-stone-300 bg-white/70 px-5 py-2.5 text-sm text-stone-700 transition hover:border-stone-400 hover:text-stone-900"
+            className="rounded-full border border-white/15 bg-white/[0.04] px-5 py-2.5 text-sm text-white/70 transition hover:border-white/30 hover:text-white"
             onClick={onReplan}
             type="button"
           >
