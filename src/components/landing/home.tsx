@@ -81,18 +81,18 @@ export function Home() {
           </span>
         </motion.nav>
 
-        <header className="mt-24 sm:mt-36 lg:mt-44">
-          <h1 className="text-[clamp(44px,11vw,108px)] font-normal leading-[0.95] tracking-[-0.04em] text-white">
-            <ScrambleIn delay={300} text="陈慕白" triggered={entered} />
+        <motion.header
+          animate={{ opacity: entered ? 1 : 0, y: entered ? 0 : 10 }}
+          className="mt-4 max-w-md"
+          transition={{ duration: 0.9, delay: 0.4, ease }}
+        >
+          <h1 className="text-base font-normal lowercase tracking-tight text-white/90 sm:text-lg">
+            <ScrambleIn delay={300} text="mubai's main site" triggered={entered} />
           </h1>
-          <motion.p
-            animate={{ opacity: entered ? 1 : 0, y: entered ? 0 : 24 }}
-            className="mt-8 max-w-xl text-sm font-normal leading-relaxed text-white/55 sm:text-base"
-            transition={{ duration: 1, delay: 0.6, ease }}
-          >
+          <p className="mt-2 text-sm font-normal leading-relaxed text-white/45">
             业余时间做些小工具和小想法。Built slowly, in Shanghai.
-          </motion.p>
-        </header>
+          </p>
+        </motion.header>
 
         <motion.section
           animate={{ opacity: entered ? 1 : 0 }}
