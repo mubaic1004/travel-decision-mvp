@@ -35,9 +35,9 @@ export default function RootLayout({
     >
       <body>
         {children}
-        <footer className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1 border-t border-white/10 bg-black py-6 text-center text-[11px] uppercase tracking-[0.18em] text-white/30">
+        <footer className="relative z-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-1 border-t border-white/10 bg-black py-6 text-center text-[11px] uppercase tracking-[0.18em] text-white/45">
           <a
-            className="transition hover:text-white/70"
+            className="transition hover:text-white"
             href="https://beian.miit.gov.cn/"
             rel="noopener noreferrer"
             target="_blank"
@@ -45,7 +45,7 @@ export default function RootLayout({
             沪ICP备2026019934号
           </a>
           <a
-            className="transition hover:text-white/70"
+            className="transition hover:text-white"
             href="https://beian.mps.gov.cn/#/query/webSearch?code=31011502406091"
             rel="noopener noreferrer"
             target="_blank"
