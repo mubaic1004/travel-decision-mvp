@@ -9,7 +9,6 @@ import { LiveClock } from "@/components/landing/live-clock";
 import { NotesSection } from "@/components/landing/notes-section";
 import { NowSection } from "@/components/landing/now-section";
 import { ProjectRow } from "@/components/landing/project-row";
-import { ScrambleIn } from "@/components/fx/scramble-in";
 import { StatsSection } from "@/components/landing/stats-section";
 
 interface Project {
@@ -92,10 +91,8 @@ export function Home() {
             className="relative mt-4 max-w-md"
             transition={{ duration: 0.9, delay: 0.4, ease }}
           >
-            <h1 className="text-base font-normal lowercase tracking-tight text-white/90 sm:text-lg">
-              <ScrambleIn delay={300} text="mubai's main site" triggered={entered} />
-            </h1>
-            <p className="mt-2 text-sm font-normal leading-relaxed text-white/45">
+            <h1 className="sr-only">陈慕白 · chenmubai</h1>
+            <p className="text-sm font-normal leading-relaxed text-white/45">
               业余时间做些小工具和小想法。Built slowly, in Shanghai.
             </p>
           </motion.header>
