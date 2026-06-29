@@ -29,6 +29,14 @@ const projects: Project[] = [
     year: "2026",
     status: "ONLINE",
   },
+  {
+    id: "02",
+    title: "手绘转 CAD",
+    subtitle: "上传手绘工程图，浏览器就地识别成矢量几何并导出 DXF。",
+    href: "/handdraw",
+    year: "2026",
+    status: "ONLINE",
+  },
 ];
 
 const ease = [0.22, 1, 0.36, 1] as const;
