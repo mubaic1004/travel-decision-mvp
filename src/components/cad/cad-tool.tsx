@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { loadImageFromSource, type LoadedImage } from "@/lib/cad/image-load";
-import { preprocess, type Preprocessed } from "@/lib/cad/preprocess";
+import type { Entity } from "@/lib/cad/model";
+import { runPipeline } from "@/lib/cad/pipeline";
+import type { Preprocessed } from "@/lib/cad/preprocess";
 import { binaryToRgba } from "@/lib/cad/raster";
 
-type View = "binary" | "skeleton" | "original";
+type View = "vector" | "binary" | "skeleton" | "original";
 type Phase = "idle" | "processing" | "ready" | "error";
 
 export function CadTool() {
@@ -15,7 +17,8 @@ export function CadTool() {
   const [error, setError] = useState<string>("");
   const [image, setImage] = useState<LoadedImage | null>(null);
   const [pre, setPre] = useState<Preprocessed | null>(null);
-  const [view, setView] = useState<View>("skeleton");
+  const [entities, setEntities] = useState<Entity[]>([]);
+  const [view, setView] = useState<View>("vector");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const run = useCallback(async (src: string | File) => {
@@ -26,8 +29,9 @@ export function CadTool() {
       setImage(loaded);
       // Yield so the spinner can paint before the heavy sync work.
       await new Promise((r) => setTimeout(r, 16));
-      const result = preprocess(loaded.gray);
-      setPre(result);
+      const result = runPipeline(loaded.gray);
+      setPre(result.pre);
+      setEntities(result.entities);
       setPhase("ready");
     } catch (err) {
       console.error(err);
@@ -51,9 +55,46 @@ export function CadTool() {
       return;
     }
     if (!pre) return;
+
+    if (view === "vector") {
+      // Faint original underneath, detected entities on top.
+      ctx.globalAlpha = 0.18;
+      ctx.putImageData(image.rgba, 0, 0);
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = "#5ad1c0";
+      ctx.lineWidth = 2;
+      for (const e of entities) {
+        if (e.kind === "line") {
+          ctx.beginPath();
+          ctx.moveTo(e.p1[0], e.p1[1]);
+          ctx.lineTo(e.p2[0], e.p2[1]);
+          ctx.stroke();
+        } else if (e.kind === "circle") {
+          ctx.beginPath();
+          ctx.arc(e.center[0], e.center[1], e.radius, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+      // Endpoint dots.
+      ctx.fillStyle = "#ffd36a";
+      for (const e of entities) {
+        if (e.kind === "line") {
+          for (const p of [e.p1, e.p2]) {
+            ctx.beginPath();
+            ctx.arc(p[0], p[1], 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+      return;
+    }
+
     const bin = view === "binary" ? pre.binary : pre.skeleton;
     ctx.putImageData(binaryToRgba(bin), 0, 0);
-  }, [view, image, pre]);
+  }, [view, image, pre, entities]);
+
+  const lineCount = entities.filter((e) => e.kind === "line").length;
+  const circleCount = entities.filter((e) => e.kind === "circle").length;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#010103]">
@@ -117,8 +158,8 @@ export function CadTool() {
         {/* Result canvas + view toggle */}
         {image ? (
           <div className="mt-10">
-            <div className="mb-4 flex flex-wrap gap-2">
-              {(["original", "binary", "skeleton"] as const).map((v) => (
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              {(["vector", "original", "binary", "skeleton"] as const).map((v) => (
                 <button
                   className={`rounded-full px-4 py-2 text-xs uppercase tracking-[0.16em] transition ${
                     view === v
@@ -129,9 +170,14 @@ export function CadTool() {
                   onClick={() => setView(v)}
                   type="button"
                 >
-                  {v === "original" ? "原图" : v === "binary" ? "二值" : "骨架"}
+                  {v === "vector" ? "识别结果" : v === "original" ? "原图" : v === "binary" ? "二值" : "骨架"}
                 </button>
               ))}
+              {phase === "ready" ? (
+                <span className="ml-2 text-xs text-white/40">
+                  {lineCount} 条线 · {circleCount} 个圆
+                </span>
+              ) : null}
             </div>
             <div className="overflow-auto rounded-xl border border-white/10 bg-black/40 p-3">
               <canvas
