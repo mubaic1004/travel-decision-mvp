@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { exportDxf } from "@/lib/cad/export-dxf";
 import { loadImageFromSource, type LoadedImage } from "@/lib/cad/image-load";
 import type { Entity } from "@/lib/cad/model";
 import { runPipeline } from "@/lib/cad/pipeline";
@@ -19,7 +20,21 @@ export function CadTool() {
   const [pre, setPre] = useState<Preprocessed | null>(null);
   const [entities, setEntities] = useState<Entity[]>([]);
   const [view, setView] = useState<View>("vector");
+  const [scale, setScale] = useState("1");
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const downloadDxf = useCallback(() => {
+    if (!image || entities.length === 0) return;
+    const s = Number(scale) || 1;
+    const dxf = exportDxf(entities, { scale: s, imageHeight: image.height });
+    const blob = new Blob([dxf], { type: "application/dxf" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "drawing.dxf";
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [image, entities, scale]);
 
   const run = useCallback(async (src: string | File) => {
     setPhase("processing");
@@ -179,6 +194,35 @@ export function CadTool() {
                 </span>
               ) : null}
             </div>
+            {phase === "ready" ? (
+              <div className="mb-4 flex flex-wrap items-end gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                <div>
+                  <label className="field-label" htmlFor="cad-scale">
+                    比例尺（毫米 / 像素）
+                  </label>
+                  <input
+                    className="field-input w-40 text-base"
+                    id="cad-scale"
+                    min={0}
+                    onChange={(e) => setScale(e.target.value)}
+                    step="0.1"
+                    type="number"
+                    value={scale}
+                  />
+                  <p className="hint-text mt-2 max-w-xs">
+                    手绘图没有真实尺寸，导出前用这个把像素换算成毫米。
+                  </p>
+                </div>
+                <button
+                  className="rounded-full bg-white px-6 py-3 text-sm font-normal text-black transition hover:bg-[#e2e2e6]"
+                  onClick={downloadDxf}
+                  type="button"
+                >
+                  下载 DXF
+                </button>
+              </div>
+            ) : null}
+
             <div className="overflow-auto rounded-xl border border-white/10 bg-black/40 p-3">
               <canvas
                 className="mx-auto block max-w-full"

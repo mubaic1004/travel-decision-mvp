@@ -1,8 +1,9 @@
 // End-to-end pipeline: grayscale image -> entities.
-// TS port of cli.py `_run_pipeline`. Circle detection is added in a later stage.
+// TS port of cli.py `_run_pipeline`.
 
+import { detectCircles, filterSegmentsOnCircles } from "@/lib/cad/detect-circles";
 import { detectLines } from "@/lib/cad/detect-lines";
-import type { Entity } from "@/lib/cad/model";
+import type { Circle, Entity, Line } from "@/lib/cad/model";
 import { preprocess, type Preprocessed } from "@/lib/cad/preprocess";
 import { regularize } from "@/lib/cad/regularize";
 import type { Gray } from "@/lib/cad/raster";
@@ -20,13 +21,18 @@ export interface PipelineResult {
 
 export function runPipeline(
   gray: Gray,
-  { minLineLength = 30, snapAngle = true }: PipelineOptions = {},
+  { minLineLength = 30, detectCircles: doCircles = true, snapAngle = true }: PipelineOptions = {},
 ): PipelineResult {
   const pre = preprocess(gray);
-  const rawLines = detectLines(pre.skeleton, { minLineLength });
-  const entities = regularize(rawLines, {
+
+  const circles: Circle[] = doCircles ? detectCircles(pre.skeleton, pre.binary) : [];
+  let rawLines: Line[] = detectLines(pre.skeleton, { minLineLength });
+  rawLines = filterSegmentsOnCircles(rawLines, circles);
+
+  const lineEntities = regularize(rawLines, {
     doSnapAngle: snapAngle,
     minLength: minLineLength,
   });
-  return { pre, entities };
+
+  return { pre, entities: [...lineEntities, ...circles] };
 }
