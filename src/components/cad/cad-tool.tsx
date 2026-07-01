@@ -8,8 +8,13 @@ import { exportDxf } from "@/lib/cad/export-dxf";
 import { exportSvg } from "@/lib/cad/export-svg";
 import { loadImageFromSource, type LoadedImage } from "@/lib/cad/image-load";
 import type { Entity } from "@/lib/cad/model";
+import { loadPdfPage } from "@/lib/cad/pdf-load";
 import { runPipeline } from "@/lib/cad/pipeline";
 import { createZip } from "@/lib/cad/zip";
+
+function isPdf(src: string | File): src is File {
+  return src instanceof File && (src.type === "application/pdf" || src.name.toLowerCase().endsWith(".pdf"));
+}
 
 type Phase = "idle" | "processing" | "ready" | "error";
 type Mode = "engineering" | "architecture";
@@ -22,26 +27,51 @@ export function CadTool() {
   const [history, setHistory] = useState<Entity[][]>([]);
   const [scale, setScale] = useState("1");
   const [mode, setMode] = useState<Mode>("engineering");
+  const [paperMmPerPx, setPaperMmPerPx] = useState<number | null>(null);
+  const [drawingRatio, setDrawingRatio] = useState("1");
   const lastSrcRef = useRef<string | File | null>(null);
 
-  const run = useCallback(async (src: string | File, m: Mode) => {
-    lastSrcRef.current = src;
-    setPhase("processing");
-    setError("");
-    try {
-      const loaded = await loadImageFromSource(src);
-      setImage(loaded);
-      await new Promise((r) => setTimeout(r, 16));
-      const result = runPipeline(loaded.gray, { snapAngle: m === "engineering" });
-      setEntities(result.entities);
-      setHistory([]);
-      setPhase("ready");
-    } catch (err) {
-      console.error(err);
-      setError(err instanceof Error ? err.message : "处理失败");
-      setPhase("error");
-    }
-  }, []);
+  const run = useCallback(
+    async (src: string | File, m: Mode) => {
+      lastSrcRef.current = src;
+      setPhase("processing");
+      setError("");
+      try {
+        let loaded: LoadedImage;
+        let paper: number | null = null;
+        if (isPdf(src)) {
+          const pdf = await loadPdfPage(src);
+          loaded = pdf;
+          paper = pdf.paperMmPerPx;
+        } else {
+          loaded = await loadImageFromSource(src);
+        }
+        setImage(loaded);
+        setPaperMmPerPx(paper);
+        if (paper) {
+          setScale(String(Number((paper * (Number(drawingRatio) || 1)).toFixed(4))));
+        }
+        await new Promise((r) => setTimeout(r, 16));
+        const result = runPipeline(loaded.gray, { snapAngle: m === "engineering" });
+        setEntities(result.entities);
+        setHistory([]);
+        setPhase("ready");
+      } catch (err) {
+        console.error(err);
+        setError(err instanceof Error ? err.message : "处理失败");
+        setPhase("error");
+      }
+    },
+    [drawingRatio],
+  );
+
+  const changeRatio = useCallback(
+    (v: string) => {
+      setDrawingRatio(v);
+      if (paperMmPerPx) setScale(String(Number((paperMmPerPx * (Number(v) || 1)).toFixed(4))));
+    },
+    [paperMmPerPx],
+  );
 
   const changeMode = useCallback(
     (m: Mode) => {
@@ -179,9 +209,9 @@ export function CadTool() {
         {/* Upload / actions */}
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <label className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-normal text-black transition hover:bg-[#e2e2e6]">
-            选择图片
+            选择图片 / PDF
             <input
-              accept="image/*"
+              accept="image/*,application/pdf"
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
@@ -204,6 +234,17 @@ export function CadTool() {
           >
             透视图示例
           </button>
+          <button
+            className="rounded-full border border-white/15 bg-white/[0.04] px-6 py-3 text-sm text-white/70 transition hover:border-white/30 hover:text-white"
+            onClick={async () => {
+              const res = await fetch("/cad-sample.pdf");
+              const blob = await res.blob();
+              void run(new File([blob], "sample.pdf", { type: "application/pdf" }), mode);
+            }}
+            type="button"
+          >
+            PDF 示例
+          </button>
         </div>
 
         {phase === "processing" ? (
@@ -218,6 +259,26 @@ export function CadTool() {
         {phase === "ready" && image ? (
           <div className="mt-10">
             <div className="mb-4 flex flex-wrap items-end gap-4 rounded-xl border border-white/10 bg-white/[0.02] p-4">
+              {paperMmPerPx != null ? (
+                <div>
+                  <label className="field-label" htmlFor="cad-ratio">
+                    图纸比例　1 :
+                  </label>
+                  <input
+                    className="field-input w-40 text-base"
+                    id="cad-ratio"
+                    min={0}
+                    onChange={(e) => changeRatio(e.target.value)}
+                    step="1"
+                    type="number"
+                    value={drawingRatio}
+                  />
+                  <p className="hint-text mt-2 max-w-xs">
+                    PDF 纸面 {paperMmPerPx.toFixed(3)} 毫米/像素。填图纸比例（1:100 就填
+                    100；PDF 本身是实际大小就填 1），自动算出真实尺寸。
+                  </p>
+                </div>
+              ) : null}
               <div>
                 <label className="field-label" htmlFor="cad-scale">
                   比例尺（毫米 / 像素）
@@ -232,7 +293,9 @@ export function CadTool() {
                   value={scale}
                 />
                 <p className="hint-text mt-2 max-w-xs">
-                  用「标定尺寸」在图上量一段已知长度可自动填这里。
+                  {paperMmPerPx != null
+                    ? "已由 PDF 与图纸比例自动算出，也可用「标定尺寸」手动校正。"
+                    : "用「标定尺寸」在图上量一段已知长度可自动填这里。"}
                 </p>
               </div>
               <div className="flex items-center gap-2">
