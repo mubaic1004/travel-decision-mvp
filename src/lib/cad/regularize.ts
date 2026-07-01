@@ -86,6 +86,12 @@ export function mergeCollinear(
   lines: Line[],
   { angleTolDeg = 14, distTol = 22, gapTol = 45 } = {},
 ): Line[] {
+  // O(n²) per pass — a noisy photo can emit thousands of junk fragments and
+  // stall for minutes. Keep the longest 1200; anything beyond that is noise a
+  // human would delete in the editor anyway.
+  if (lines.length > 1200) {
+    lines = [...lines].sort((a, b) => lineLength(b) - lineLength(a)).slice(0, 1200);
+  }
   const used = new Array(lines.length).fill(false);
   const merged: Line[] = [];
 

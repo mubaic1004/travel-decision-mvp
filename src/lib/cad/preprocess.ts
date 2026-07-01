@@ -114,9 +114,16 @@ export function skeletonize(bin: Binary): Binary {
     return img[y * width + x];
   };
 
+  // Iteration cap: each pass erodes ~1px from stroke borders, so passes needed
+  // ≈ half the thickest stroke. Real pen strokes converge in <10; the cap only
+  // bites on pathological blobs (photo shadows), keeping worst case bounded
+  // instead of freezing for minutes.
+  const MAX_PASSES = 40;
+  let passes = 0;
   let changed = true;
   const toClear: number[] = [];
-  while (changed) {
+  while (changed && passes < MAX_PASSES) {
+    passes += 1;
     changed = false;
     for (let step = 0; step < 2; step += 1) {
       toClear.length = 0;

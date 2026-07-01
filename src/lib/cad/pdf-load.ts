@@ -19,7 +19,9 @@ export interface LoadedPdf extends LoadedImage {
 
 export async function loadPdfPage(file: File, pageNumber = 1): Promise<LoadedPdf> {
   const pdfjs = await import("pdfjs-dist");
-  pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+  // Served as .js (not .mjs): EdgeOne returns application/octet-stream for
+  // .mjs, and browsers refuse module workers with a non-JS MIME type.
+  pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.js";
 
   const buf = await file.arrayBuffer();
   const doc = await pdfjs.getDocument({ data: buf }).promise;

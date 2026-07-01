@@ -9,11 +9,44 @@ import { exportSvg } from "@/lib/cad/export-svg";
 import { loadImageFromSource, type LoadedImage } from "@/lib/cad/image-load";
 import type { Entity } from "@/lib/cad/model";
 import { loadPdfPage } from "@/lib/cad/pdf-load";
-import { runPipeline } from "@/lib/cad/pipeline";
+import { runPipeline, type PipelineOptions } from "@/lib/cad/pipeline";
+import type { Gray } from "@/lib/cad/raster";
 import { createZip } from "@/lib/cad/zip";
 
 function isPdf(src: string | File): src is File {
   return src instanceof File && (src.type === "application/pdf" || src.name.toLowerCase().endsWith(".pdf"));
+}
+
+// Run recognition in a Web Worker so heavy images can't freeze the tab;
+// falls back to synchronous execution if workers are unavailable.
+function runPipelineInWorker(gray: Gray, options: PipelineOptions): Promise<Entity[]> {
+  return new Promise((resolve, reject) => {
+    let worker: Worker;
+    try {
+      worker = new Worker(new URL("../../lib/cad/pipeline.worker.ts", import.meta.url));
+    } catch {
+      try {
+        resolve(runPipeline(gray, options).entities);
+      } catch (e) {
+        reject(e);
+      }
+      return;
+    }
+    worker.onmessage = (ev: MessageEvent<{ ok: boolean; entities?: Entity[]; error?: string }>) => {
+      worker.terminate();
+      if (ev.data.ok && ev.data.entities) resolve(ev.data.entities);
+      else reject(new Error(ev.data.error ?? "识别失败"));
+    };
+    worker.onerror = () => {
+      worker.terminate();
+      try {
+        resolve(runPipeline(gray, options).entities);
+      } catch (e) {
+        reject(e);
+      }
+    };
+    worker.postMessage({ gray, options });
+  });
 }
 
 type Phase = "idle" | "processing" | "ready" | "error";
@@ -51,9 +84,10 @@ export function CadTool() {
         if (paper) {
           setScale(String(Number((paper * (Number(drawingRatio) || 1)).toFixed(4))));
         }
-        await new Promise((r) => setTimeout(r, 16));
-        const result = runPipeline(loaded.gray, { snapAngle: m === "engineering" });
-        setEntities(result.entities);
+        const entities = await runPipelineInWorker(loaded.gray, {
+          snapAngle: m === "engineering",
+        });
+        setEntities(entities);
         setHistory([]);
         setPhase("ready");
       } catch (err) {
