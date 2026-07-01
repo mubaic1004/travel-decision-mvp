@@ -1,9 +1,13 @@
 // End-to-end pipeline: grayscale image -> entities.
-// TS port of cli.py `_run_pipeline`.
+// TS port of cli.py `_run_pipeline`, extended with arc strokes + angle mode.
 
-import { detectCircles, filterSegmentsOnCircles } from "@/lib/cad/detect-circles";
-import { detectLines } from "@/lib/cad/detect-lines";
-import type { Circle, Entity, Line } from "@/lib/cad/model";
+import {
+  detectCircles,
+  filterArcsOnCircles,
+  filterSegmentsOnCircles,
+} from "@/lib/cad/detect-circles";
+import { detectStrokes } from "@/lib/cad/detect-lines";
+import type { Circle, Entity } from "@/lib/cad/model";
 import { preprocess, type Preprocessed } from "@/lib/cad/preprocess";
 import { regularize } from "@/lib/cad/regularize";
 import type { Gray } from "@/lib/cad/raster";
@@ -11,6 +15,8 @@ import type { Gray } from "@/lib/cad/raster";
 export interface PipelineOptions {
   minLineLength?: number;
   detectCircles?: boolean;
+  // Engineering mode snaps line angles to 0/45/90/135. Turn OFF for
+  // architectural / perspective sketches so all angles are preserved.
   snapAngle?: boolean;
 }
 
@@ -26,13 +32,14 @@ export function runPipeline(
   const pre = preprocess(gray);
 
   const circles: Circle[] = doCircles ? detectCircles(pre.skeleton, pre.binary) : [];
-  let rawLines: Line[] = detectLines(pre.skeleton, { minLineLength });
-  rawLines = filterSegmentsOnCircles(rawLines, circles);
+  const { lines: rawLines, arcs: rawArcs } = detectStrokes(pre.skeleton, { minLineLength });
+  const filtered = filterSegmentsOnCircles(rawLines, circles);
+  const arcs = filterArcsOnCircles(rawArcs, circles);
 
-  const lineEntities = regularize(rawLines, {
+  const lineEntities = regularize(filtered, {
     doSnapAngle: snapAngle,
     minLength: minLineLength,
   });
 
-  return { pre, entities: [...lineEntities, ...circles] };
+  return { pre, entities: [...lineEntities, ...arcs, ...circles] };
 }

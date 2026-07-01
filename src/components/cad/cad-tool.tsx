@@ -12,6 +12,7 @@ import { binaryToRgba } from "@/lib/cad/raster";
 
 type View = "vector" | "binary" | "skeleton" | "original";
 type Phase = "idle" | "processing" | "ready" | "error";
+type Mode = "engineering" | "architecture";
 
 export function CadTool() {
   const [phase, setPhase] = useState<Phase>("idle");
@@ -21,7 +22,9 @@ export function CadTool() {
   const [entities, setEntities] = useState<Entity[]>([]);
   const [view, setView] = useState<View>("vector");
   const [scale, setScale] = useState("1");
+  const [mode, setMode] = useState<Mode>("engineering");
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const lastSrcRef = useRef<string | File | null>(null);
 
   const downloadDxf = useCallback(() => {
     if (!image || entities.length === 0) return;
@@ -36,7 +39,8 @@ export function CadTool() {
     URL.revokeObjectURL(url);
   }, [image, entities, scale]);
 
-  const run = useCallback(async (src: string | File) => {
+  const run = useCallback(async (src: string | File, m: Mode) => {
+    lastSrcRef.current = src;
     setPhase("processing");
     setError("");
     try {
@@ -44,7 +48,7 @@ export function CadTool() {
       setImage(loaded);
       // Yield so the spinner can paint before the heavy sync work.
       await new Promise((r) => setTimeout(r, 16));
-      const result = runPipeline(loaded.gray);
+      const result = runPipeline(loaded.gray, { snapAngle: m === "engineering" });
       setPre(result.pre);
       setEntities(result.entities);
       setPhase("ready");
@@ -54,6 +58,14 @@ export function CadTool() {
       setPhase("error");
     }
   }, []);
+
+  const changeMode = useCallback(
+    (m: Mode) => {
+      setMode(m);
+      if (lastSrcRef.current) void run(lastSrcRef.current, m);
+    },
+    [run],
+  );
 
   // Paint the selected view onto the canvas.
   useEffect(() => {
@@ -88,6 +100,12 @@ export function CadTool() {
           ctx.beginPath();
           ctx.arc(e.center[0], e.center[1], e.radius, 0, Math.PI * 2);
           ctx.stroke();
+        } else if (e.kind === "arc") {
+          const a0 = (e.startAngle * Math.PI) / 180;
+          const a1 = (e.endAngle * Math.PI) / 180;
+          ctx.beginPath();
+          ctx.arc(e.center[0], e.center[1], e.radius, a0, a1, a1 < a0);
+          ctx.stroke();
         }
       }
       // Endpoint dots.
@@ -110,6 +128,7 @@ export function CadTool() {
 
   const lineCount = entities.filter((e) => e.kind === "line").length;
   const circleCount = entities.filter((e) => e.kind === "circle").length;
+  const arcCount = entities.filter((e) => e.kind === "arc").length;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#010103]">
@@ -132,13 +151,38 @@ export function CadTool() {
             把手绘工程图变成可编辑的 CAD 图纸
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-white/55 sm:text-base">
-            上传一张由直线和圆构成的手绘图，浏览器会就地识别成矢量几何 ——
-            全程在你的设备上完成，图片不上传任何服务器。
+            上传手绘的工程图或建筑透视线稿（直线、弧线、圆都能识别），浏览器就地
+            转成矢量几何并导出 DXF —— 全程在你的设备上完成，图片不上传任何服务器。
           </p>
         </header>
 
+        {/* Mode selector */}
+        <div className="mt-10">
+          <p className="mb-3 text-[11px] uppercase tracking-[0.24em] text-white/40">识别模式</p>
+          <div className="flex flex-wrap gap-2">
+            {([
+              ["engineering", "工程图", "把线吸附到水平/垂直/45°直角"],
+              ["architecture", "建筑 / 透视", "保留所有角度，识别弧线"],
+            ] as const).map(([m, label, desc]) => (
+              <button
+                className={`rounded-2xl border px-4 py-3 text-left transition ${
+                  mode === m
+                    ? "border-white/40 bg-white/[0.08]"
+                    : "border-white/10 bg-white/[0.02] hover:border-white/25"
+                }`}
+                key={m}
+                onClick={() => changeMode(m)}
+                type="button"
+              >
+                <span className="block text-sm text-white">{label}</span>
+                <span className="mt-0.5 block text-[11px] text-white/40">{desc}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Upload / actions */}
-        <div className="mt-10 flex flex-wrap items-center gap-3">
+        <div className="mt-6 flex flex-wrap items-center gap-3">
           <label className="cursor-pointer rounded-full bg-white px-6 py-3 text-sm font-normal text-black transition hover:bg-[#e2e2e6]">
             选择图片
             <input
@@ -146,17 +190,24 @@ export function CadTool() {
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
-                if (f) void run(f);
+                if (f) void run(f, mode);
               }}
               type="file"
             />
           </label>
           <button
             className="rounded-full border border-white/15 bg-white/[0.04] px-6 py-3 text-sm text-white/70 transition hover:border-white/30 hover:text-white"
-            onClick={() => void run("/cad-sample.png")}
+            onClick={() => void run("/cad-sample.png", mode)}
             type="button"
           >
-            用示例图试试
+            工程图示例
+          </button>
+          <button
+            className="rounded-full border border-white/15 bg-white/[0.04] px-6 py-3 text-sm text-white/70 transition hover:border-white/30 hover:text-white"
+            onClick={() => void run("/cad-arch-sample.png", mode)}
+            type="button"
+          >
+            透视图示例
           </button>
         </div>
 
@@ -190,7 +241,7 @@ export function CadTool() {
               ))}
               {phase === "ready" ? (
                 <span className="ml-2 text-xs text-white/40">
-                  {lineCount} 条线 · {circleCount} 个圆
+                  {lineCount} 条线 · {arcCount} 段弧 · {circleCount} 个圆
                 </span>
               ) : null}
             </div>

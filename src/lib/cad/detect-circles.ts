@@ -4,7 +4,7 @@
 // (_circumference_support) -> dedup. Then filterSegmentsOnCircles drops line
 // fragments that are really arcs of a detected circle.
 
-import { lineLength, makeCircle, type Circle, type Line, type Point } from "@/lib/cad/model";
+import { lineLength, makeCircle, type Arc, type Circle, type Line, type Point } from "@/lib/cad/model";
 import type { Binary } from "@/lib/cad/raster";
 
 const NB8: Array<[number, number]> = [
@@ -45,7 +45,7 @@ function connectedComponents(skel: Binary): Point[][] {
 }
 
 // Algebraic least-squares circle fit (normal equations of A=[2x,2y,1], b=x²+y²).
-function fitCircleLsq(pts: Point[]): { cx: number; cy: number; r: number } | null {
+export function fitCircleLsq(pts: Point[]): { cx: number; cy: number; r: number } | null {
   if (pts.length < 3) return null;
   // Build AᵀA (3x3 symmetric) and Aᵀb (3).
   let a00 = 0, a01 = 0, a02 = 0, a11 = 0, a12 = 0, a22 = 0;
@@ -163,6 +163,20 @@ export function detectCircles(
     circles.push(makeCircle([cx, cy], r));
   }
   return dedupCircles(circles);
+}
+
+// Drop arcs that coincide with an already-detected full circle (same
+// center/radius) — otherwise a circle also shows up as redundant arc fragments.
+export function filterArcsOnCircles(arcs: Arc[], circles: Circle[]): Arc[] {
+  if (circles.length === 0) return arcs;
+  return arcs.filter(
+    (arc) =>
+      !circles.some(
+        (c) =>
+          Math.hypot(arc.center[0] - c.center[0], arc.center[1] - c.center[1]) < 0.25 * c.radius &&
+          Math.abs(arc.radius - c.radius) < 0.25 * c.radius,
+      ),
+  );
 }
 
 // Drop short segments that are genuinely arc fragments of a detected circle.
