@@ -5,9 +5,11 @@ import { useCallback, useRef, useState } from "react";
 
 import { CanvasEditor } from "@/components/cad/canvas-editor";
 import { exportDxf } from "@/lib/cad/export-dxf";
+import { exportSvg } from "@/lib/cad/export-svg";
 import { loadImageFromSource, type LoadedImage } from "@/lib/cad/image-load";
 import type { Entity } from "@/lib/cad/model";
 import { runPipeline } from "@/lib/cad/pipeline";
+import { createZip } from "@/lib/cad/zip";
 
 type Phase = "idle" | "processing" | "ready" | "error";
 type Mode = "engineering" | "architecture";
@@ -65,17 +67,58 @@ export function CadTool() {
     });
   }, []);
 
+  const triggerDownload = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const downloadDxf = useCallback(() => {
     if (!image || entities.length === 0) return;
     const s = Number(scale) || 1;
     const dxf = exportDxf(entities, { scale: s, imageHeight: image.height });
-    const blob = new Blob([dxf], { type: "application/dxf" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "drawing.dxf";
-    a.click();
-    URL.revokeObjectURL(url);
+    triggerDownload(new Blob([dxf], { type: "application/dxf" }), "drawing.dxf");
+  }, [image, entities, scale]);
+
+  // Bundle: DXF (real units) + underlay PNG + aligned self-contained SVG + README.
+  const downloadBundle = useCallback(() => {
+    if (!image || entities.length === 0) return;
+    const s = Number(scale) || 1;
+
+    // Encode the (downscaled) base image to PNG.
+    const off = document.createElement("canvas");
+    off.width = image.width;
+    off.height = image.height;
+    const octx = off.getContext("2d");
+    if (!octx) return;
+    octx.putImageData(image.rgba, 0, 0);
+    const pngDataUrl = off.toDataURL("image/png");
+    const pngBytes = Uint8Array.from(atob(pngDataUrl.split(",")[1]), (c) => c.charCodeAt(0));
+
+    const dxf = exportDxf(entities, { scale: s, imageHeight: image.height });
+    const svg = exportSvg(entities, {
+      width: image.width,
+      height: image.height,
+      pngDataUrl,
+    });
+    const readme =
+      `手绘转 CAD 导出包\n\n` +
+      `- drawing.dxf : 矢量图形，真实毫米单位（比例尺 ${s} 毫米/像素）。\n` +
+      `- underlay.png : 手绘底图，像素坐标与 DXF 对应。\n` +
+      `- preview.svg : 底图 + 矢量叠加，双击用浏览器打开即可对照。\n\n` +
+      `在 CAD 里叠加底图：附着/插入 underlay.png，插入点设为 (0,0)，\n` +
+      `缩放比例设为 ${s}（毫米/像素），即与矢量对齐。\n`;
+
+    const zip = createZip([
+      { name: "drawing.dxf", data: new TextEncoder().encode(dxf) },
+      { name: "underlay.png", data: pngBytes },
+      { name: "preview.svg", data: new TextEncoder().encode(svg) },
+      { name: "README.txt", data: new TextEncoder().encode(readme) },
+    ]);
+    triggerDownload(zip, "handdraw-cad.zip");
   }, [image, entities, scale]);
 
   const lineCount = entities.filter((e) => e.kind === "line").length;
@@ -202,11 +245,18 @@ export function CadTool() {
                   ↶ 撤销
                 </button>
                 <button
-                  className="rounded-full bg-white px-6 py-3 text-sm font-normal text-black transition hover:bg-[#e2e2e6]"
+                  className="rounded-full border border-white/15 bg-white/[0.04] px-5 py-3 text-sm text-white/70 transition hover:border-white/30 hover:text-white"
                   onClick={downloadDxf}
                   type="button"
                 >
-                  下载 DXF
+                  仅 DXF
+                </button>
+                <button
+                  className="rounded-full bg-white px-6 py-3 text-sm font-normal text-black transition hover:bg-[#e2e2e6]"
+                  onClick={downloadBundle}
+                  type="button"
+                >
+                  下载带底图 (ZIP)
                 </button>
               </div>
               <span className="ml-auto text-xs text-white/40">
