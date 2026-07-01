@@ -116,6 +116,15 @@ const ARC_RMS_TOL = 3.0; // px: max RMS residual to a fitted circle to count as 
 function classifyPolyline(pts: Point[], minSeg: number, cornerThresh: number): Array<Line | Arc> {
   if (pts.length < 2) return [];
 
+  // Bound the cost of fitting/splitting on very long traces: keep every k-th
+  // point (plus the last). ~3000 samples is ample for PCA/circle fits.
+  if (pts.length > 3000) {
+    const stride = Math.ceil(pts.length / 3000);
+    const last = pts[pts.length - 1];
+    pts = pts.filter((_, i) => i % stride === 0);
+    if (pts[pts.length - 1] !== last) pts.push(last);
+  }
+
   // 1. Straight? (low deviation from its own chord/axis)
   const { c, u } = fitLinePca(pts);
   let maxDev = 0;
@@ -169,20 +178,46 @@ export function detectStrokes(
   skeleton: Binary,
   { minLineLength = 30, cornerThresh = 6 }: DetectLinesOptions = {},
 ): DetectStrokesResult {
-  const { data, width, height } = skeleton;
+  const { width, height } = skeleton;
+  // Local copy: we erase blob interiors below without touching the caller's raster.
+  const data = new Uint8Array(skeleton.data);
   const minSeg = Math.max(12, minLineLength * 0.4);
   const idx = (p: Point) => p[1] * width + p[0];
 
-  // Degree (neighbor count) per ink pixel.
   const deg = new Int8Array(width * height);
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      const i = y * width + x;
-      if (data[i] > 0) deg[i] = inkNeighbors(data, width, height, x, y).length;
+  const computeDeg = () => {
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        const i = y * width + x;
+        deg[i] = data[i] > 0 ? inkNeighbors(data, width, height, x, y).length : 0;
+      }
     }
+  };
+  computeDeg();
+
+  // Photo shadows / solid blobs survive the capped thinning as filled masses
+  // where every pixel looks like a junction. Tracing wanders such a mass and
+  // blows up memory (this crashed the tab on real photos). A genuine 1px
+  // skeleton pixel has ≤5 neighbors, so erase deg≥6 "interior" pixels.
+  for (let round = 0; round < 3; round += 1) {
+    let erased = 0;
+    for (let i = 0; i < data.length; i += 1) {
+      if (data[i] > 0 && deg[i] >= 6) {
+        data[i] = 0;
+        erased += 1;
+      }
+    }
+    if (erased === 0) break;
+    computeDeg();
   }
 
   const consumed = new Uint8Array(width * height); // degree-2 pixels already traced
+  // Per-walk stamps on junction pixels: revisiting one within the same walk
+  // means we're cycling inside a junction cluster — bail instead of looping.
+  const junctionStamp = new Int32Array(width * height);
+  let walkId = 0;
+  const MAX_PATH = 20000; // hard bound on a single traced path
+  const MAX_POLYLINES = 5000; // hard bound on total traced paths
 
   // Pick the neighbor that best continues the incoming direction (straightest),
   // so strokes trace THROUGH crossings/junctions instead of breaking there.
@@ -213,14 +248,21 @@ export function detectStrokes(
   }
 
   function walk(start: Point, first: Point): Point[] {
+    walkId += 1;
     const path: Point[] = [start];
     let prev = start;
     let cur = first;
-    for (let g = 0; g < width * height; g += 1) {
+    for (let g = 0; g < MAX_PATH; g += 1) {
       path.push(cur);
       const ci = idx(cur);
       if (deg[ci] === 1) break; // reached an endpoint
-      if (deg[ci] === 2) consumed[ci] = 1;
+      if (deg[ci] === 2) {
+        consumed[ci] = 1;
+      } else {
+        // Junction: seeing it twice in one walk means we're cycling — bail.
+        if (junctionStamp[ci] === walkId) break;
+        junctionStamp[ci] = walkId;
+      }
       const next = nextStep(prev, cur);
       if (!next) break;
       if (next[0] === start[0] && next[1] === start[1] && path.length > 3) break; // closed loop
@@ -231,14 +273,15 @@ export function detectStrokes(
   }
 
   const polylines: Point[][] = [];
+  const full = () => polylines.length >= MAX_POLYLINES;
   const startable = (nb: Point) => {
     const ni = idx(nb);
     return deg[ni] !== 2 || !consumed[ni];
   };
 
   // 1. Start from endpoints.
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
+  for (let y = 0; y < height && !full(); y += 1) {
+    for (let x = 0; x < width && !full(); x += 1) {
       const i = y * width + x;
       if (deg[i] !== 1) continue;
       const nb = inkNeighbors(data, width, height, x, y)[0];
@@ -246,18 +289,19 @@ export function detectStrokes(
     }
   }
   // 2. Start remaining branches from junctions.
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
+  for (let y = 0; y < height && !full(); y += 1) {
+    for (let x = 0; x < width && !full(); x += 1) {
       const i = y * width + x;
       if (deg[i] < 3) continue;
       for (const nb of inkNeighbors(data, width, height, x, y)) {
+        if (full()) break;
         if (deg[idx(nb)] === 2 && !consumed[idx(nb)]) polylines.push(walk([x, y], nb));
       }
     }
   }
   // 3. Remaining pure loops (degree-2 pixels never consumed).
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
+  for (let y = 0; y < height && !full(); y += 1) {
+    for (let x = 0; x < width && !full(); x += 1) {
       const i = y * width + x;
       if (deg[i] !== 2 || consumed[i]) continue;
       const nb = inkNeighbors(data, width, height, x, y)[0];
