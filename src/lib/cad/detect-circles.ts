@@ -132,6 +132,93 @@ function dedupCircles(circles: Circle[]): Circle[] {
   return kept;
 }
 
+// Circumcircle of 3 points (exact fit for a minimal RANSAC sample).
+function circleFrom3(a: Point, b: Point, c: Point): { cx: number; cy: number; r: number } | null {
+  const d = 2 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]));
+  if (Math.abs(d) < 1e-6) return null;
+  const a2 = a[0] * a[0] + a[1] * a[1];
+  const b2 = b[0] * b[0] + b[1] * b[1];
+  const c2 = c[0] * c[0] + c[1] * c[1];
+  const cx = (a2 * (b[1] - c[1]) + b2 * (c[1] - a[1]) + c2 * (a[1] - b[1])) / d;
+  const cy = (a2 * (c[0] - b[0]) + b2 * (a[0] - c[0]) + c2 * (b[0] - a[0])) / d;
+  const r = Math.hypot(a[0] - cx, a[1] - cy);
+  return { cx, cy, r };
+}
+
+// Deterministic PRNG so detection is stable across runs.
+function mulberry32(seed: number): () => number {
+  let s = seed >>> 0;
+  return () => {
+    s += 0x6d2b79f5;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// RANSAC circle detection: finds circles even amid crossing lines (where the
+// connected-component approach fails because the ring touches other strokes).
+// Strongly gated by circumference support to avoid Hough-style phantom circles.
+export function detectCirclesRansac(
+  skeleton: Binary,
+  binary: Binary,
+  { minRadius = 15, tol = 3, minSupport = 0.82, maxIters = 3000 }: DetectCirclesOptions & { tol?: number; maxIters?: number } = {},
+): Circle[] {
+  const { data, width, height } = skeleton;
+  const pts: Point[] = [];
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      if (data[y * width + x] > 0) pts.push([x, y]);
+    }
+  }
+  if (pts.length < 60) return [];
+  const maxRadius = Math.min(width, height) / 2;
+  const rng = mulberry32(0x9e3779b1);
+  const found: Circle[] = [];
+
+  for (let iter = 0; iter < maxIters && found.length < 6; iter += 1) {
+    const a = pts[(rng() * pts.length) | 0];
+    const b = pts[(rng() * pts.length) | 0];
+    const c = pts[(rng() * pts.length) | 0];
+    const fit = circleFrom3(a, b, c);
+    if (!fit || fit.r < minRadius || fit.r > maxRadius) continue;
+    if (
+      found.some(
+        (k) =>
+          Math.hypot(fit.cx - k.center[0], fit.cy - k.center[1]) < 0.3 * k.radius &&
+          Math.abs(fit.r - k.radius) < 0.3 * k.radius,
+      )
+    )
+      continue;
+    if (circumferenceSupport(binary, fit.cx, fit.cy, fit.r, 96, tol) < minSupport) continue;
+    found.push(makeCircle([fit.cx, fit.cy], fit.r));
+  }
+  return found;
+}
+
+// Erase a circle's ring from a skeleton copy so line detection doesn't turn it
+// into a polygon of short segments.
+export function eraseCircles(skeleton: Binary, circles: Circle[], tol = 2.5): Binary {
+  if (circles.length === 0) return skeleton;
+  const out = new Uint8Array(skeleton.data);
+  const { width, height } = skeleton;
+  for (const c of circles) {
+    const x0 = Math.max(0, Math.floor(c.center[0] - c.radius - tol));
+    const x1 = Math.min(width - 1, Math.ceil(c.center[0] + c.radius + tol));
+    const y0 = Math.max(0, Math.floor(c.center[1] - c.radius - tol));
+    const y1 = Math.min(height - 1, Math.ceil(c.center[1] + c.radius + tol));
+    for (let y = y0; y <= y1; y += 1) {
+      for (let x = x0; x <= x1; x += 1) {
+        if (Math.abs(Math.hypot(x - c.center[0], y - c.center[1]) - c.radius) <= tol) {
+          out[y * width + x] = 0;
+        }
+      }
+    }
+  }
+  return { data: out, width, height };
+}
+
 export interface DetectCirclesOptions {
   minRadius?: number;
   maxResidual?: number;

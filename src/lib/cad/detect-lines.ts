@@ -91,6 +91,21 @@ function arcFromRun(pts: Point[], cx: number, cy: number, r: number): Arc | null
   const a0 = unwrapped[0];
   const a1 = unwrapped[unwrapped.length - 1];
   if (Math.abs(a1 - a0) < (25 * Math.PI) / 180) return null; // too shallow -> keep as line
+
+  // Smoothness gate: a real arc sweeps monotonically around its center. A
+  // polygonal corner traced as one polyline would reverse direction — reject it
+  // so corners fall through to line splitting instead of becoming fake arcs.
+  const overall = Math.sign(a1 - a0) || 1;
+  let sameSign = 0;
+  let steps = 0;
+  for (let i = 1; i < unwrapped.length; i += 1) {
+    const d = unwrapped[i] - unwrapped[i - 1];
+    if (Math.abs(d) < 1e-6) continue;
+    steps += 1;
+    if (Math.sign(d) === overall) sameSign += 1;
+  }
+  if (steps > 0 && sameSign / steps < 0.85) return null;
+
   return makeArc([cx, cy], r, (a0 * 180) / Math.PI, (a1 * 180) / Math.PI);
 }
 
@@ -156,55 +171,97 @@ export function detectStrokes(
 ): DetectStrokesResult {
   const { data, width, height } = skeleton;
   const minSeg = Math.max(12, minLineLength * 0.4);
+  const idx = (p: Point) => p[1] * width + p[0];
 
-  // Neighbor count per ink pixel; nodes = endpoints (1) or junctions (>=3).
-  const isNode = new Uint8Array(width * height);
-  const isInk = (i: number) => data[i] > 0;
+  // Degree (neighbor count) per ink pixel.
+  const deg = new Int8Array(width * height);
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {
       const i = y * width + x;
-      if (!isInk(i)) continue;
-      const cnt = inkNeighbors(data, width, height, x, y).length;
-      if (cnt === 1 || cnt >= 3) isNode[i] = 1;
+      if (data[i] > 0) deg[i] = inkNeighbors(data, width, height, x, y).length;
     }
   }
 
-  const consumed = new Uint8Array(width * height); // non-node pixels already traced
-  const polylines: Point[][] = [];
+  const consumed = new Uint8Array(width * height); // degree-2 pixels already traced
 
-  // Trace every path starting from each node into each of its ink neighbors.
+  // Pick the neighbor that best continues the incoming direction (straightest),
+  // so strokes trace THROUGH crossings/junctions instead of breaking there.
+  function nextStep(prev: Point, cur: Point): Point | null {
+    const avail = inkNeighbors(data, width, height, cur[0], cur[1]).filter((n) => {
+      if (n[0] === prev[0] && n[1] === prev[1]) return false;
+      const ni = idx(n);
+      return deg[ni] !== 2 || !consumed[ni];
+    });
+    if (avail.length === 0) return null;
+    if (avail.length === 1) return avail[0];
+    const ix = cur[0] - prev[0];
+    const iy = cur[1] - prev[1];
+    const il = Math.hypot(ix, iy) || 1;
+    let best = avail[0];
+    let bestScore = -Infinity;
+    for (const n of avail) {
+      const dx = n[0] - cur[0];
+      const dy = n[1] - cur[1];
+      const dl = Math.hypot(dx, dy) || 1;
+      const s = (ix * dx + iy * dy) / (il * dl);
+      if (s > bestScore) {
+        bestScore = s;
+        best = n;
+      }
+    }
+    return best;
+  }
+
+  function walk(start: Point, first: Point): Point[] {
+    const path: Point[] = [start];
+    let prev = start;
+    let cur = first;
+    for (let g = 0; g < width * height; g += 1) {
+      path.push(cur);
+      const ci = idx(cur);
+      if (deg[ci] === 1) break; // reached an endpoint
+      if (deg[ci] === 2) consumed[ci] = 1;
+      const next = nextStep(prev, cur);
+      if (!next) break;
+      if (next[0] === start[0] && next[1] === start[1] && path.length > 3) break; // closed loop
+      prev = cur;
+      cur = next;
+    }
+    return path;
+  }
+
+  const polylines: Point[][] = [];
+  const startable = (nb: Point) => {
+    const ni = idx(nb);
+    return deg[ni] !== 2 || !consumed[ni];
+  };
+
+  // 1. Start from endpoints.
   for (let y = 0; y < height; y += 1) {
     for (let x = 0; x < width; x += 1) {
       const i = y * width + x;
-      if (!isNode[i]) continue;
+      if (deg[i] !== 1) continue;
+      const nb = inkNeighbors(data, width, height, x, y)[0];
+      if (nb && startable(nb)) polylines.push(walk([x, y], nb));
+    }
+  }
+  // 2. Start remaining branches from junctions.
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const i = y * width + x;
+      if (deg[i] < 3) continue;
       for (const nb of inkNeighbors(data, width, height, x, y)) {
-        const startIdx = nb[1] * width + nb[0];
-        if (isNode[startIdx]) {
-          // Direct node-to-node edge; only record once (x,y) < neighbor.
-          if (i < startIdx) polylines.push([[x, y], nb]);
-          continue;
-        }
-        if (consumed[startIdx]) continue;
-        // Walk the 2-neighbor chain until the next node.
-        const path: Point[] = [[x, y]];
-        let prev: Point = [x, y];
-        let cur: Point = nb;
-        for (let guard = 0; guard < width * height; guard += 1) {
-          const ci = cur[1] * width + cur[0];
-          path.push(cur);
-          if (isNode[ci]) break;
-          consumed[ci] = 1;
-          const nbrs = inkNeighbors(data, width, height, cur[0], cur[1]).filter(
-            (p) => !(p[0] === prev[0] && p[1] === prev[1]),
-          );
-          // Prefer an unconsumed, non-backward neighbor.
-          const next = nbrs.find((p) => !consumed[p[1] * width + p[0]]) ?? nbrs[0];
-          if (!next) break;
-          prev = cur;
-          cur = next;
-        }
-        polylines.push(path);
+        if (deg[idx(nb)] === 2 && !consumed[idx(nb)]) polylines.push(walk([x, y], nb));
       }
+    }
+  }
+  // 3. Remaining pure loops (degree-2 pixels never consumed).
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const i = y * width + x;
+      if (deg[i] !== 2 || consumed[i]) continue;
+      const nb = inkNeighbors(data, width, height, x, y)[0];
+      if (nb) polylines.push(walk([x, y], nb));
     }
   }
 
