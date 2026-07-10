@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 
 import { AboutSection } from "@/components/landing/about-section";
+import { AnniversaryTakeover } from "@/components/landing/anniversary-takeover";
 import { CursorFollower } from "@/components/landing/cursor-follower";
 import { LiveClock } from "@/components/landing/live-clock";
 import { NotesSection } from "@/components/landing/notes-section";
@@ -51,6 +52,7 @@ export function Home() {
 
   return (
     <main className="relative overflow-hidden bg-[#010103]">
+      <AnniversaryTakeover />
       <CursorFollower />
 
       {/* Fixed background + texture spanning the whole scroll */}
