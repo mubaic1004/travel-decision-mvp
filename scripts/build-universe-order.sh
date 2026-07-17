@@ -27,8 +27,11 @@ s = s.replace(
   'fetch("/api/sales", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ category }) }).then((response) => response.json()).then((data: { count?: number }) => { if (typeof data.count === "number") setSales((current) => ({ ...current, [category]: data.count! })); }).catch(() => undefined);',
   '/* sales counter disabled on static host */'
 );
+// 移除页脚「宇宙总销量 0」块（静态站计数器已禁用，显示 0 无意义）
+s = s.split('<div className="sales-trust"><strong>{totalSales}</strong><span>{t.sold}</span><small>{t.realAnonymous}</small></div>').join('');
 if (s.includes("/api/sales")) { console.error("WARN: /api/sales 仍残留"); }
 if (s.includes('"/categories/') || s.includes('"/og-v2.png"')) { console.error("WARN: 绝对资源路径仍残留"); }
+if (s.includes('className="sales-trust"')) { console.error("WARN: 销量块未移除"); }
 fs.writeFileSync(outp, s);
 console.log("page.tsx 改写完成");
 NODE
