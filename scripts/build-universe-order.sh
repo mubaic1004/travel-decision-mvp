@@ -29,6 +29,12 @@ s = s.replace(
 );
 // 移除页脚「宇宙总销量 0」块（静态站计数器已禁用，显示 0 无意义）
 s = s.split('<div className="sales-trust"><strong>{totalSales}</strong><span>{t.sold}</span><small>{t.realAnonymous}</small></div>').join('');
+// 英雄标题下加一句金色双语副标题，说明这个站是干什么的
+s = s.replace(
+  '<h1>{t.heroA}<br/><em>{t.heroB}</em></h1>',
+  '<h1>{t.heroA}<br/><em>{t.heroB}</em></h1><p className="hero-tagline">{cn ? "宇宙都会帮你实现愿望" : "The universe helps your wishes come true"}</p>'
+);
+if (!s.includes('hero-tagline')) { console.error("WARN: 副标题未插入"); }
 if (s.includes("/api/sales")) { console.error("WARN: /api/sales 仍残留"); }
 if (s.includes('"/categories/') || s.includes('"/og-v2.png"')) { console.error("WARN: 绝对资源路径仍残留"); }
 if (s.includes('className="sales-trust"')) { console.error("WARN: 销量块未移除"); }
@@ -59,6 +65,16 @@ echo "== 5. 生成 app.css（系统中文字体 + 手写样式，去掉 tailwind
 }
 CSS
   grep -v '@import "tailwindcss";' "$SRC/app/globals.css"
+  cat <<'CSS'
+
+/* ── 静态站移动端/可读性覆盖（在原样式之后，优先级更高）── */
+/* 手机上也显示站名「宇宙已接单」，否则只剩一个 U 图标，看不出是干嘛的 */
+.brand > span:last-child { display: inline !important; }
+/* 英雄首屏标题缩到约原来的一半（原 clamp(46px,6vw,78px)/手机 44px）*/
+.order-page h1 { font-size: clamp(24px, 4.2vw, 40px); letter-spacing: -0.03em; }
+/* 新增的金色双语副标题：说明这个站是干什么的 */
+.hero-tagline { max-width: 640px; margin: 16px auto 0; font-family: var(--font-serif), serif; font-size: clamp(15px, 2vw, 20px); line-height: 1.6; color: var(--gold); letter-spacing: .02em; }
+CSS
 } > "$STAGE/app.css"
 
 echo "== 6. 组装输出目录 =="

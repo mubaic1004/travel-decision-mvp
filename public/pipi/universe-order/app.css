@@ -407,3 +407,11 @@ footer a { color: inherit; text-underline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
 }
+
+/* ── 静态站移动端/可读性覆盖（在原样式之后，优先级更高）── */
+/* 手机上也显示站名「宇宙已接单」，否则只剩一个 U 图标，看不出是干嘛的 */
+.brand > span:last-child { display: inline !important; }
+/* 英雄首屏标题缩到约原来的一半（原 clamp(46px,6vw,78px)/手机 44px）*/
+.order-page h1 { font-size: clamp(24px, 4.2vw, 40px); letter-spacing: -0.03em; }
+/* 新增的金色双语副标题：说明这个站是干什么的 */
+.hero-tagline { max-width: 640px; margin: 16px auto 0; font-family: var(--font-serif), serif; font-size: clamp(15px, 2vw, 20px); line-height: 1.6; color: var(--gold); letter-spacing: .02em; }
