@@ -43,7 +43,7 @@ const projects: Project[] = [
     id: "03",
     title: "给宇宙的订单",
     subtitle: "把愿望说清楚，郑重下单，然后放心去生活。宇宙都会帮你实现。",
-    href: "/pipi/universe-order/",
+    href: "/universe-order/",
     year: "2026",
     status: "ONLINE",
     external: true,

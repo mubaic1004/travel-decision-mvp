@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# 把 universe-order（vinext 全栈应用）静态化，产出到 chenmubai.cn 的 public/pipi/universe-order/
+# 把 universe-order（vinext 全栈应用）静态化，产出到 chenmubai.cn 的 public/universe-order/
 # 纯客户端 SPA：esbuild 编译 page.tsx + React，手写 CSS 原样用，系统中文字体，计数器禁用。
 set -euo pipefail
 
 SRC="/Users/chenmubai/Documents/胖皮的收纳世界/universe-order"
 STAGE="$SRC/.uobuild"                                   # 放项目内，让 esbuild 能解析 node_modules 里的 react
-OUT="/Users/chenmubai/初步ai制作/public/pipi/universe-order"
+OUT="/Users/chenmubai/初步ai制作/public/universe-order"
 
 echo "== 1. 准备 staging =="
 rm -rf "$STAGE"; mkdir -p "$STAGE"
@@ -15,7 +15,7 @@ node - "$SRC/app/page.tsx" "$STAGE/page.tsx" <<'NODE'
 const fs = require("fs");
 const [,, inp, outp] = process.argv;
 let s = fs.readFileSync(inp, "utf8");
-// 绝对资源路径 -> 相对（配合 <base href="/pipi/universe-order/">，有无结尾斜杠都对）
+// 绝对资源路径 -> 相对（配合 <base href="/universe-order/">，有无结尾斜杠都对）
 s = s.split('"/categories/').join('"categories/');
 s = s.split('"/og-v2.png"').join('"og-v2.png"');
 // 禁用跨访客销量计数器（静态站无后端）：GET 直接置空，POST 去掉
@@ -86,15 +86,15 @@ cp -R "$SRC/public/categories" "$OUT/categories"
 cp "$SRC/public/og-v2.png" "$OUT/og-v2.png"
 cp "$SRC/public/favicon.svg" "$OUT/favicon.svg"
 
-echo "== 7. index.html（<base> + noindex）=="
+echo "== 7. index.html（<base>）=="
 cat > "$OUT/index.html" <<'EOF'
 <!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <base href="/pipi/universe-order/">
+  <base href="/universe-order/">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="把愿望说清楚，郑重下单，然后放心去生活。宇宙都会帮你实现。">
   <title>宇宙已接单｜把愿望说清楚，然后放心去生活</title>
   <link rel="icon" href="favicon.svg">
   <link rel="stylesheet" href="app.css">
