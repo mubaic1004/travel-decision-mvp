@@ -2,20 +2,27 @@
 
 import { useEffect, useState } from "react";
 
-const formatter = new Intl.DateTimeFormat("zh-CN", {
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-  hourCycle: "h23",
-  timeZone: "Asia/Shanghai",
-});
+const makeFormatter = (timeZone: string) =>
+  new Intl.DateTimeFormat("zh-CN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+    timeZone,
+  });
 
-// Live Shanghai time, ticking once per second.
+const shanghai = makeFormatter("Asia/Shanghai");
+const sanFrancisco = makeFormatter("America/Los_Angeles");
+
+// Live times for the two cities I split my time between, ticking once per second.
 export function LiveClock() {
-  const [time, setTime] = useState<string | null>(null);
+  const [times, setTimes] = useState<{ sh: string; sf: string } | null>(null);
 
   useEffect(() => {
-    const tick = () => setTime(formatter.format(new Date()));
+    const tick = () => {
+      const now = new Date();
+      setTimes({ sh: shanghai.format(now), sf: sanFrancisco.format(now) });
+    };
     tick();
     const interval = window.setInterval(tick, 1000);
     return () => window.clearInterval(interval);
@@ -23,11 +30,12 @@ export function LiveClock() {
 
   return (
     <span
-      aria-label="当前上海时间"
-      className="tabular-nums text-white/40 transition-opacity"
-      style={{ opacity: time ? 1 : 0 }}
+      aria-label="当前上海与旧金山时间"
+      className="block text-right leading-relaxed tracking-[0.12em] tabular-nums text-white/40 transition-opacity"
+      style={{ opacity: times ? 1 : 0 }}
     >
-      SHANGHAI · {time ?? "00:00:00"}
+      <span className="block whitespace-nowrap">SHANGHAI · {times?.sh ?? "00:00:00"}</span>
+      <span className="block whitespace-nowrap">SAN FRANCISCO · {times?.sf ?? "00:00:00"}</span>
     </span>
   );
 }

@@ -113,7 +113,7 @@ export function Home() {
           >
             <h1 className="sr-only">陈慕白 · chenmubai</h1>
             <p className="text-sm font-normal leading-relaxed text-white/45">
-              业余时间做些小工具和小想法。Built slowly, in Shanghai.
+              业余时间做些小工具和小想法。Built slowly, between Shanghai &amp; San Francisco.
             </p>
           </motion.header>
 
@@ -156,7 +156,7 @@ export function Home() {
 
         {/* ── bottom bar ── */}
         <div className="flex flex-wrap items-baseline justify-between gap-2 border-t border-white/10 py-10 text-[11px] uppercase tracking-[0.22em] text-white/30">
-          <span>MADE SLOWLY · IN SHANGHAI</span>
+          <span>MADE SLOWLY · SHANGHAI ↔ SAN FRANCISCO</span>
           <span>V2.6 · 2026</span>
         </div>
       </div>
