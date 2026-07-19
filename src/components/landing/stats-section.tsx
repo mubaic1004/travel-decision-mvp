@@ -4,7 +4,7 @@ import { motion } from "motion/react";
 
 // ── 改这里：数字面板 ───────────────────────────────
 const STATS = [
-  { value: "01", label: "在线工具", sub: "TOOLS LIVE" },
+  { value: "03", label: "在线工具", sub: "TOOLS LIVE" },
   { value: "50+", label: "覆盖城市", sub: "CITIES" },
   { value: "2026", label: "始于", sub: "SINCE" },
   { value: "100%", label: "独立搭建", sub: "SELF-BUILT" },
