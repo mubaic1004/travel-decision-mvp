@@ -7,3 +7,6 @@ out
 .npm-cache
 tsconfig.tsbuildinfo
 .vercel
+
+# 健身工具的原始 vinext 仓库拷贝，仅作移植参考，不属于本站
+Codex/

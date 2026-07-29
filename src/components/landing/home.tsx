@@ -48,6 +48,14 @@ const projects: Project[] = [
     status: "ONLINE",
     external: true,
   },
+  {
+    id: "04",
+    title: "练哪儿",
+    subtitle: "选个部位、报下手边的器械，它配一套有结构的训练，顺手记住你这周练了多少。",
+    href: "/workout",
+    year: "2026",
+    status: "ONLINE",
+  },
 ];
 
 const ease = [0.22, 1, 0.36, 1] as const;
